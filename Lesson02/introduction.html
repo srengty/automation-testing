@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackbox and Whitebox Testing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main class="deck">
+        <img class="school-logo" src="images/logo.png" alt="School logo">
+        <section class="slides" id="slides">
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Session Opening</p>
+                    <h1>Blackbox and Whitebox Testing</h1>
+                </header>
+                <div class="content">
+                    <p>Understanding testing strategies based on knowledge of code internals and functional
+                        specifications.</p>
+                    <div class="pill-row">
+                        <span class="pill">Blackbox</span>
+                        <span class="pill">Whitebox</span>
+                        <span class="pill">Strategy</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:00 - 0:05 | Welcome and setup</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Agenda</p>
+                    <h2>Session Roadmap</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Part 1:</strong> Foundations and Overview</li>
+                        <li><strong>Part 2:</strong> Blackbox Testing Deep Dive</li>
+                        <li><strong>Part 3:</strong> Whitebox Testing Deep Dive</li>
+                        <li><strong>Part 4:</strong> Hands-on Lab Exercises</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Theory</span>
+                        <span class="pill">Practice</span>
+                        <span class="pill">Assessment</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:05 - 0:10 | Agenda walkthrough</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Learning Outcomes</p>
+                    <h2>What You Should Be Able to Do</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Differentiate between blackbox and whitebox testing approaches.</li>
+                        <li>Apply equivalence partitioning and boundary value analysis.</li>
+                        <li>Implement path coverage and statement coverage testing.</li>
+                        <li>Choose appropriate testing strategies for different scenarios.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:10 - 0:15 | Outcomes and expectations</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>What Is Testing Strategy?</h2>
+                </header>
+                <div class="content">
+                    <p>Testing strategy determines how we approach testing based on what we know about the system under
+                        test, focusing on either external behavior or internal structure.</p>
+                    <img class="slide-image" src="images/blackbox-whitebox.png"
+                        alt="Blackbox vs Whitebox testing illustration">
+                    <div class="pill-row">
+                        <span class="pill">Strategy</span>
+                        <span class="pill">Coverage</span>
+                        <span class="pill">Quality</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:15 - 0:20 | Core definition</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Blackbox Testing</p>
+                    <h2>Functional Testing Approach</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Tests functionality without examining internal code structure.</li>
+                        <li>Based on specifications, requirements, and user expectations.</li>
+                        <li>Focuses on input-output behavior and user scenarios.</li>
+                        <li>Independent of implementation details.</li>
+                    </ul>
+                    <img class="slide-image" src="images/blackbox-testing.png" alt="Blackbox testing illustration">
+                </div>
+                <footer class="footer">
+                    <small>0:20 - 0:25 | Blackbox fundamentals</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Blackbox Testing</p>
+                    <h2>Key Techniques</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Equivalence Partitioning:</strong> Group inputs into valid/invalid classes.</li>
+                        <li><strong>Boundary Value Analysis:</strong> Test at edges of input domains.</li>
+                        <li><strong>Decision Tables:</strong> Map complex business rules.</li>
+                        <li><strong>State Transition Testing:</strong> Test system behavior changes.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:25 - 0:32 | Blackbox techniques</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Whitebox Testing</p>
+                    <h2>Structural Testing Approach</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Tests based on internal code structure and logic.</li>
+                        <li>Examines control flow, data flow, and execution paths.</li>
+                        <li>Ensures all code paths are tested and validated.</li>
+                        <li>Requires knowledge of implementation details.</li>
+                    </ul>
+                    <img class="slide-image" src="images/code-coverage.png" alt="Code coverage illustration">
+                </div>
+                <footer class="footer">
+                    <small>0:32 - 0:38 | Whitebox fundamentals</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Whitebox Testing</p>
+                    <h2>Coverage Criteria</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Statement Coverage:</strong> Execute every line of code.</li>
+                        <li><strong>Branch Coverage:</strong> Test all decision outcomes (true/false).</li>
+                        <li><strong>Path Coverage:</strong> Execute all possible execution paths.</li>
+                        <li><strong>Condition Coverage:</strong> Test all boolean sub-expressions.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:38 - 0:45 | Coverage criteria</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Comparison</p>
+                    <h2>Blackbox vs Whitebox Testing</h2>
+                </header>
+                <div class="content">
+                    <table style="width: 100%; font-size: 0.9em;">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Blackbox</th>
+                                <th>Whitebox</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Focus</td>
+                                <td>Functionality</td>
+                                <td>Code Structure</td>
+                            </tr>
+                            <tr>
+                                <td>Knowledge</td>
+                                <td>No implementation</td>
+                                <td>Full implementation</td>
+                            </tr>
+                            <tr>
+                                <td>Testing</td>
+                                <td>User perspective</td>
+                                <td>Developer perspective</td>
+                            </tr>
+                            <tr>
+                                <td>Coverage</td>
+                                <td>Requirement-based</td>
+                                <td>Code-based</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>0:45 - 0:52 | Strategy comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">When to Use</p>
+                    <h2>Choosing the Right Approach</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Blackbox:</strong> User acceptance, system testing, requirements validation.</li>
+                        <li><strong>Whitebox:</strong> Unit testing, code review, security testing.</li>
+                        <li><strong>Combined:</strong> Most effective testing uses both approaches.</li>
+                        <li><strong>Gray-box:</strong> Hybrid approach combining both strategies.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:52 - 0:58 | Strategy selection</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Practical Example</p>
+                    <h2>Calculator Testing Scenario</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Blackbox:</strong> Test addition with valid/invalid inputs, edge cases.</li>
+                        <li><strong>Whitebox:</strong> Ensure all conditional branches are executed.</li>
+                        <li>Focus on both user requirements and code coverage.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Input validation</span>
+                        <span class="pill">Edge cases</span>
+                        <span class="pill">Path coverage</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:58 - 1:05 | Practical application</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop 1</p>
+                    <h2>Interactive Activity: Test Classification</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Exercise:</strong> Classify these test scenarios as Blackbox or Whitebox:</p>
+                    <ul>
+                        <li>Testing if login works with correct credentials</li>
+                        <li>Verifying all if-else branches are executed</li>
+                        <li>Testing boundary values for age input (0, 18, 120)</li>
+                        <li>Ensuring all methods in a class are called</li>
+                        <li>Testing system behavior with invalid data</li>
+                    </ul>
+                    <p><em>5 minutes discussion time</em></p>
+                </div>
+                <footer class="footer">
+                    <small>1:05 - 1:10 | Interactive workshop</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 2: Blackbox Testing</p>
+                    <h2>Equivalence Partitioning Technique</h2>
+                </header>
+                <div class="content">
+                    <p>Divide input domain into classes where all values should behave similarly:</p>
+                    <ul>
+                        <li><strong>Valid partitions:</strong> Input that should work correctly</li>
+                        <li><strong>Invalid partitions:</strong> Input that should be rejected</li>
+                        <li><strong>Rule:</strong> Test at least one value from each partition</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Systematic</span>
+                        <span class="pill">Efficient</span>
+                        <span class="pill">Complete</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:10 - 1:18 | Equivalence partitioning</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Blackbox Example</p>
+                    <h2>Age Validation Function</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Requirements:</strong> Accept ages 18-65 for job application</p>
+                    <table style="width: 100%; margin: 1rem 0;">
+                        <thead>
+                            <tr>
+                                <th>Partition</th>
+                                <th>Range</th>
+                                <th>Test Value</th>
+                                <th>Expected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Too young</td>
+                                <td>
+                                    < 18</td>
+                                <td>16</td>
+                                <td>Invalid</td>
+                            </tr>
+                            <tr>
+                                <td>Valid age</td>
+                                <td>18-65</td>
+                                <td>25</td>
+                                <td>Valid</td>
+                            </tr>
+                            <tr>
+                                <td>Too old</td>
+                                <td>> 65</td>
+                                <td>70</td>
+                                <td>Invalid</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>1:18 - 1:25 | Practical example</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Blackbox Technique</p>
+                    <h2>Boundary Value Analysis</h2>
+                </header>
+                <div class="content">
+                    <p>Test values at the edges of input domains where errors commonly occur:</p>
+                    <ul>
+                        <li><strong>Just below minimum:</strong> Test value just below valid range</li>
+                        <li><strong>Minimum value:</strong> Test lowest valid input</li>
+                        <li><strong>Just above minimum:</strong> Test value just above minimum</li>
+                        <li><strong>Maximum value:</strong> Test highest valid input</li>
+                        <li><strong>Just above maximum:</strong> Test value just above valid range</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>1:25 - 1:32 | Boundary analysis</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop 2</p>
+                    <h2>Hands-on: Design Test Cases</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Scenario:</strong> Password strength validator</p>
+                    <p><strong>Rules:</strong> 8-20 characters, must contain uppercase, lowercase, digit</p>
+                    <p><strong>Your task (10 minutes):</strong></p>
+                    <ul>
+                        <li>Identify equivalence partitions</li>
+                        <li>Design boundary value tests</li>
+                        <li>List at least 8 test cases</li>
+                        <li>Include both valid and invalid scenarios</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>1:32 - 1:42 | Workshop activity</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Blackbox Advanced</p>
+                    <h2>Decision Tables</h2>
+                </header>
+                <div class="content">
+                    <p>Systematic approach for complex business rules with multiple conditions:</p>
+                    <table style="width: 100%; font-size: 0.8em;">
+                        <thead>
+                            <tr>
+                                <th>Condition</th>
+                                <th>Rule 1</th>
+                                <th>Rule 2</th>
+                                <th>Rule 3</th>
+                                <th>Rule 4</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Age ≥ 18</td>
+                                <td>T</td>
+                                <td>T</td>
+                                <td>F</td>
+                                <td>F</td>
+                            </tr>
+                            <tr>
+                                <td>Has License</td>
+                                <td>T</td>
+                                <td>F</td>
+                                <td>T</td>
+                                <td>F</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Action</strong></td>
+                                <td><strong>Allow</strong></td>
+                                <td><strong>Reject</strong></td>
+                                <td><strong>Reject</strong></td>
+                                <td><strong>Reject</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Each column represents a test case</p>
+                </div>
+                <footer class="footer">
+                    <small>1:42 - 1:48 | Decision tables</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 3: Whitebox Testing</p>
+                    <h2>Understanding Code Coverage</h2>
+                </header>
+                <div class="content">
+                    <p>Code coverage measures how much of your source code is tested:</p>
+                    <ul>
+                        <li><strong>Statement Coverage:</strong> % of code lines executed</li>
+                        <li><strong>Branch Coverage:</strong> % of decision points tested</li>
+                        <li><strong>Path Coverage:</strong> % of execution paths tested</li>
+                        <li><strong>Function Coverage:</strong> % of functions called</li>
+                    </ul>
+                    <img class="slide-image" src="images/code-coverage.png" alt="Code coverage visualization">
+                </div>
+                <footer class="footer">
+                    <small>1:48 - 1:55 | Coverage fundamentals</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Whitebox Example</p>
+                    <h2>Statement Coverage Analysis</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Code Example:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 1rem; border-radius: 8px; font-size: 0.85em;"><code class="language-java">
+public int divide(int a, int b) {
+    if (b == 0) {               // Line 1
+        throw new Exception();  // Line 2
+    }
+    int result = a / b;         // Line 3
+    return result;              // Line 4
+}</code></pre>
+                    <p><strong>Test:</strong> divide(10, 2) covers lines 1, 3, 4 = 75% coverage</p>
+                    <p><strong>Missing:</strong> Line 2 (exception path)</p>
+                </div>
+                <footer class="footer">
+                    <small>1:55 - 2:02 | Statement coverage</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Whitebox Example</p>
+                    <h2>Branch Coverage Analysis</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Same Code with Branch Focus:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 1rem; border-radius: 8px; font-size: 0.85em;"><code class="language-java">
+public int divide(int a, int b) {
+    if (b == 0) {         // Decision point: TRUE or FALSE?
+        throw new Exception();  
+    }
+    int result = a / b;         
+    return result;              
+}</code></pre>
+                    <p><strong>Need 2 tests for 100% branch coverage:</strong></p>
+                    <ul>
+                        <li>Test 1: divide(10, 2) → covers FALSE branch</li>
+                        <li>Test 2: divide(10, 0) → covers TRUE branch</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>2:02 - 2:08 | Branch coverage</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop 3</p>
+                    <h2>Path Coverage Exercise</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Analyze this function:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 0.8rem; border-radius: 8px; font-size: 0.75em;"><code class="language-java">
+public String grade(int score) {
+    if (score >= 90) {
+        return "A";
+    } else if (score >= 80) {
+        return "B";  
+    } else if (score >= 70) {
+        return "C";
+    } else {
+        return "F";
+    }
+}</code></pre>
+                    <p><strong>Task:</strong> How many test cases for 100% path coverage?</p>
+                    <p><em>5 minutes - identify all execution paths</em></p>
+                </div>
+                <footer class="footer">
+                    <small>2:08 - 2:13 | Path coverage workshop</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Whitebox Advanced</p>
+                    <h2>Cyclomatic Complexity</h2>
+                </header>
+                <div class="content">
+                    <p>Measure of code complexity based on decision points:</p>
+                    <ul>
+                        <li><strong>Formula:</strong> V(G) = E - N + 2P</li>
+                    </ul>
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; font-size: 0.85em; margin: 1rem 0;">
+                        <p><strong>Formula Elements:</strong></p>
+                        <ul style="margin: 0.5rem 0;">
+                            <li><strong>V(G):</strong> Cyclomatic complexity of graph G</li>
+                            <li><strong>E:</strong> Number of edges in the control flow graph</li>
+                            <li><strong>N:</strong> Number of nodes in the control flow graph</li>
+                            <li><strong>P:</strong> Number of connected components (usually 1)</li>
+                        </ul>
+                    </div>
+                    <ul>
+                        <li><strong>Simple:</strong> Count decision points + 1</li>
+                        <li><strong>if, while, for, case:</strong> Each adds +1 to complexity</li>
+                        <li><strong>Guideline:</strong> Complexity > 10 suggests refactoring</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Maintainable</span>
+                        <span class="pill">Testable</span>
+                        <span class="pill">Quality</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:13 - 2:20 | Complexity analysis</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Testing Tools</p>
+                    <h2>Coverage Tools in Practice</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Java:</strong> JaCoCo, Cobertura, EclEmma</li>
+                        <li><strong>JavaScript:</strong> Istanbul, Jest coverage</li>
+                        <li><strong>Python:</strong> Coverage.py, pytest-cov</li>
+                        <li><strong>C#:</strong> dotCover, Fine Code Coverage</li>
+                        <li><strong>IDE Integration:</strong> Real-time coverage in VS Code</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Automation</span>
+                        <span class="pill">Reports</span>
+                        <span class="pill">CI/CD</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:20 - 2:25 | Tools overview</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 4: Labs</p>
+                    <h2>Hands-on Practice Session</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Lab 1 - Calculator Testing (20 minutes):</strong></p>
+                    <ul>
+                        <li>Analyze existing Calculator class</li>
+                        <li>Run blackbox and whitebox test suites</li>
+                        <li>Compare coverage reports</li>
+                        <li>Add missing test cases</li>
+                    </ul>
+                    <p><strong>Lab 2 - BankAccount Testing (20 minutes):</strong></p>
+                    <ul>
+                        <li>Design test cases from requirements</li>
+                        <li>Implement both testing approaches</li>
+                        <li>Achieve 100% branch coverage</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>2:25 - 2:30 | Lab introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Assessment</p>
+                    <h2>Quick Knowledge Check</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Questions for discussion:</strong></p>
+                    <ul>
+                        <li>When would you prioritize blackbox over whitebox testing?</li>
+                        <li>What's the minimum coverage needed for critical functions?</li>
+                        <li>How do you test private methods in whitebox testing?</li>
+                        <li>What are the risks of 100% path coverage obsession?</li>
+                        <li>How do blackbox and whitebox complement each other?</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>2:50 - 2:55 | Assessment discussion</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Real-world Application</p>
+                    <h2>Industry Case Studies</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>E-commerce:</strong> Payment processing requires both approaches</li>
+                        <li><strong>Healthcare:</strong> Safety-critical systems need extensive coverage</li>
+                        <li><strong>Financial:</strong> Regulatory compliance demands audit trails</li>
+                        <li><strong>Gaming:</strong> User experience focus on blackbox testing</li>
+                        <li><strong>Embedded:</strong> Resource constraints limit whitebox tools</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>2:55 - 3:00 | Industry perspective</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Lab Exercise</p>
+                    <h2>Hands-on Practice</h2>
+                </header>
+                <div class="content">
+                    <p>In our lab, you will:</p>
+                    <ul>
+                        <li>Implement a Calculator class with multiple operations.</li>
+                        <li>Write blackbox tests using equivalence partitioning.</li>
+                        <li>Create whitebox tests for complete path coverage.</li>
+                        <li>Compare effectiveness of both approaches.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>1:05 - 1:15 | Lab introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Best Practices</p>
+                    <h2>Effective Testing Strategy</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Start with blackbox tests based on requirements.</li>
+                        <li>Add whitebox tests to ensure code coverage.</li>
+                        <li>Use static analysis tools for whitebox insights.</li>
+                        <li>Document test rationale for both approaches.</li>
+                        <li>Maintain balance between coverage and effort.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>1:15 - 1:20 | Best practices</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Summary</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Blackbox testing validates functional requirements.</li>
+                        <li>Whitebox testing ensures code structure quality.</li>
+                        <li>Both approaches are complementary, not competitive.</li>
+                        <li>Choose strategy based on testing goals and context.</li>
+                        <li>Effective testing combines multiple approaches.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>3:00 - 3:05 | Session wrap-up</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+        </section>
+
+        <nav class="navigation">
+            <div class="page-navigation">
+                <span class="slide-counter" id="counter">1 / 33</span>
+                <div class="page-numbers" id="pageNumbers">
+                    <!-- Page numbers will be generated by JavaScript -->
+                </div>
+                <div class="page-jump">
+                    <input type="number" id="pageInput" min="1" max="33" placeholder="Go to slide..." 
+                           onkeypress="if(event.key==='Enter') goToSlide(parseInt(this.value))">
+                    <button onclick="goToSlide(parseInt(document.getElementById('pageInput').value))">Go</button>
+                </div>
+            </div>
+            
+            <div class="nav-controls">
+                <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+                    <span>←</span>Previous
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+                    Next<span>→</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+            <div class="lightbox-content">
+                <img id="lightboxImage" alt="" />
+                <button class="lightbox-close" id="lightboxClose" onclick="closeLightbox()">×</button>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
