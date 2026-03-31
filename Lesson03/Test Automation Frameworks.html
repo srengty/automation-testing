@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Automation Frameworks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main class="deck">
+        <img class="school-logo" src="images/logo.png" alt="School logo">
+        <section class="slides" id="slides">
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Session Opening</p>
+                    <h1>Test Automation Frameworks</h1>
+                </header>
+                <div class="content">
+                    <p>Building robust, scalable automation solutions for modern software testing with comprehensive frameworks, tools, and best practices.</p>
+                    <div class="pill-row">
+                        <span class="pill">Automation</span>
+                        <span class="pill">Frameworks</span>
+                        <span class="pill">Quality</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:00 - 0:05 | Welcome and setup</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Agenda</p>
+                    <h2>Session Roadmap</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Part 1:</strong> Framework Foundations and Architecture</li>
+                        <li><strong>Part 2:</strong> Testing Tools and Libraries Integration</li>
+                        <li><strong>Part 3:</strong> Design Patterns and Best Practices</li>
+                        <li><strong>Part 4:</strong> Build, CI/CD, and Reporting</li>
+                        <li><strong>Part 5:</strong> Hands-on Implementation Labs</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Theory</span>
+                        <span class="pill">Practice</span>
+                        <span class="pill">Implementation</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:05 - 0:10 | Agenda walkthrough</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Learning Outcomes</p>
+                    <h2>What You Should Be Able to Do</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Design and implement comprehensive test automation frameworks.</li>
+                        <li>Integrate JUnit/TestNG with Selenium/Playwright for UI automation.</li>
+                        <li>Implement Page Object and Screenplay design patterns.</li>
+                        <li>Build API automation with REST-assured and HTTP testing.</li>
+                        <li>Configure Maven/Gradle builds and CI/CD pipelines.</li>
+                        <li>Apply mocking, dependency injection, and reporting tools.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:10 - 0:15 | Outcomes and expectations</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>What Is a Test Automation Framework?</h2>
+                </header>
+                <div class="content">
+                    <p>A test automation framework is a structured approach that provides guidelines, standards, and tools for creating and executing automated tests efficiently and maintainably.</p>
+                    <div class="pill-row">
+                        <span class="pill">Structure</span>
+                        <span class="pill">Reusability</span>
+                        <span class="pill">Maintainability</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:15 - 0:25 | Framework concepts</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Framework Components</p>
+                    <h2>Essential Building Blocks</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Test Runner:</strong> JUnit, TestNG, or custom execution engine</li>
+                        <li><strong>Driver Layer:</strong> WebDriver, API clients, mobile drivers</li>
+                        <li><strong>Page Objects:</strong> UI element abstraction and interaction</li>
+                        <li><strong>Test Data:</strong> Management, generation, and parameterization</li>
+                        <li><strong>Utilities:</strong> Common functions, helpers, and configurations</li>
+                        <li><strong>Reporting:</strong> Results, logs, screenshots, and metrics</li>
+                        <li><strong>CI Integration:</strong> Build tools and pipeline configuration</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Modular</span>
+                        <span class="pill">Scalable</span>
+                        <span class="pill">Extensible</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:25 - 0:35 | Component overview</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Framework Types</p>
+                    <h2>Common Automation Approaches</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Framework Type</th>
+                                <th>Characteristics</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Linear/Record-Playback</strong></td>
+                                <td>Sequential test steps</td>
+                                <td>Simple smoke tests</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data-Driven</strong></td>
+                                <td>External test data</td>
+                                <td>Multiple input scenarios</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Keyword-Driven</strong></td>
+                                <td>Reusable action words</td>
+                                <td>Business-readable tests</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hybrid/Modular</strong></td>
+                                <td>Combined approaches</td>
+                                <td>Complex applications</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>0:35 - 0:45 | Framework types comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Testing Libraries</p>
+                    <h2>JUnit vs TestNG</h2>
+                </header>
+                <div class="content">
+                    <p><strong>JUnit 5 Features:</strong></p>
+                    <ul>
+                        <li>Modern architecture with JUnit Platform</li>
+                        <li>Parameterized tests and dynamic tests</li>
+                        <li>Conditional execution and tags</li>
+                        <li>Excellent IDE and Maven/Gradle integration</li>
+                    </ul>
+                    <p><strong>TestNG Advantages:</strong></p>
+                    <ul>
+                        <li>Advanced test configuration and dependencies</li>
+                        <li>Flexible test grouping and parallel execution</li>
+                        <li>Built-in data providers and XML configuration</li>
+                        <li>Comprehensive reporting capabilities</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Annotations</span>
+                        <span class="pill">Assertions</span>
+                        <span class="pill">Lifecycle</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:45 - 0:55 | Testing frameworks comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">UI Automation</p>
+                    <h2>Selenium WebDriver Integration</h2>
+                </header>
+                <div class="content">
+                    <p>Selenium WebDriver provides browser automation through a common interface:</p>
+                    <ul>
+                        <li><strong>Cross-browser support:</strong> Chrome, Firefox, Safari, Edge</li>
+                        <li><strong>Language bindings:</strong> Java, Python, C#, JavaScript</li>
+                        <li><strong>Element location:</strong> By ID, XPath, CSS selectors</li>
+                        <li><strong>Actions:</strong> Click, type, navigation, JavaScript execution</li>
+                        <li><strong>Waits:</strong> Implicit, explicit, and fluent wait strategies</li>
+                    </ul>
+                    <pre><code class="language-java">WebDriver driver = new ChromeDriver();
+driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+WebElement loginButton = driver.findElement(By.id("login-btn"));
+loginButton.click();</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Cross-browser</span>
+                        <span class="pill">Stable</span>
+                        <span class="pill">Mature</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:55 - 1:05 | Selenium fundamentals</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Modern UI Automation</p>
+                    <h2>Playwright Advantages</h2>
+                </header>
+                <div class="content">
+                    <p>Playwright offers modern web automation with enhanced capabilities:</p>
+                    <ul>
+                        <li><strong>Multi-browser:</strong> Chromium, Firefox, WebKit support</li>
+                        <li><strong>Auto-waits:</strong> Built-in waiting for elements and network</li>
+                        <li><strong>Network interception:</strong> Mock APIs and modify requests</li>
+                        <li><strong>Mobile emulation:</strong> Device-specific testing</li>
+                        <li><strong>Screenshots/videos:</strong> Automatic visual evidence</li>
+                        <li><strong>Trace viewer:</strong> Debug test execution steps</li>
+                    </ul>
+                    <pre><code class="language-java">Playwright playwright = Playwright.create();
+Browser browser = playwright.chromium().launch();
+Page page = browser.newPage();
+page.navigate("https://example.com");
+page.locator("#login-btn").click();</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Modern</span>
+                        <span class="pill">Fast</span>
+                        <span class="pill">Reliable</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:05 - 1:15 | Playwright overview</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Design Pattern</p>
+                    <h2>Page Object Model (POM)</h2>
+                </header>
+                <div class="content">
+                    <p>Page Object Model encapsulates page elements and actions into reusable classes:</p>
+                    <ul>
+                        <li><strong>Encapsulation:</strong> Hide implementation details</li>
+                        <li><strong>Maintainability:</strong> Centralized element management</li>
+                        <li><strong>Reusability:</strong> Common actions across tests</li>
+                        <li><strong>Readability:</strong> Business-focused test methods</li>
+                    </ul>
+                    <pre><code class="language-java">public class LoginPage {
+    private WebDriver driver;
+    
+    @FindBy(id = "username") 
+    private WebElement usernameField;
+    
+    @FindBy(id = "password") 
+    private WebElement passwordField;
+    
+    public void login(String username, String password) {
+        usernameField.sendKeys(username);
+        passwordField.sendKeys(password);
+        loginButton.click();
+    }
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Encapsulation</span>
+                        <span class="pill">Maintainable</span>
+                        <span class="pill">DRY</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:15 - 1:25 | Page Object pattern</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Advanced Pattern</p>
+                    <h2>Screenplay Pattern</h2>
+                </header>
+                <div class="content">
+                    <p>Screenplay pattern focuses on actors, tasks, and interactions for better test clarity:</p>
+                    <ul>
+                        <li><strong>Actor-based:</strong> Tests written from user perspective</li>
+                        <li><strong>Task composition:</strong> Complex workflows from simple tasks</li>
+                        <li><strong>SOLID principles:</strong> Better object-oriented design</li>
+                        <li><strong>Living documentation:</strong> Self-explaining test code</li>
+                    </ul>
+                    <pre><code class="language-java">Actor user = Actor.named("John");
+
+user.attemptsTo(
+    Navigate.to("/login"),
+    Enter.theValue("john@example.com").into(LoginForm.USERNAME),
+    Enter.theValue("password123").into(LoginForm.PASSWORD),
+    Click.on(LoginForm.SUBMIT_BUTTON)
+);
+
+user.should(See.that(Dashboard.WELCOME_MESSAGE, isVisible()));</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Actor-based</span>
+                        <span class="pill">Readable</span>
+                        <span class="pill">Scalable</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:25 - 1:35 | Screenplay pattern</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">API Testing</p>
+                    <h2>REST-assured Framework</h2>
+                </header>
+                <div class="content">
+                    <p>REST-assured provides a fluent API for testing REST services:</p>
+                    <ul>
+                        <li><strong>BDD-style syntax:</strong> Given-When-Then structure</li>
+                        <li><strong>JSON/XML support:</strong> Built-in parsing and validation</li>
+                        <li><strong>Authentication:</strong> OAuth, Basic Auth, API keys</li>
+                        <li><strong>Schema validation:</strong> JSON Schema and XML DTD</li>
+                        <li><strong>Request/Response logging:</strong> Detailed debugging info</li>
+                    </ul>
+                    <pre><code class="language-java">given()
+    .contentType(ContentType.JSON)
+    .body(newUser)
+.when()
+    .post("/api/users")
+.then()
+    .statusCode(201)
+    .body("name", equalTo("John Doe"))
+    .body("email", notNullValue());</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Fluent API</span>
+                        <span class="pill">Validation</span>
+                        <span class="pill">BDD</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:35 - 1:45 | REST-assured fundamentals</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Mocking</p>
+                    <h2>Mockito for Test Isolation</h2>
+                </header>
+                <div class="content">
+                    <p>Mockito enables unit testing with mock objects and behavior verification:</p>
+                    <ul>
+                        <li><strong>Mock creation:</strong> Interface and class mocking</li>
+                        <li><strong>Stubbing:</strong> Define mock behavior and return values</li>
+                        <li><strong>Verification:</strong> Ensure methods called with correct parameters</li>
+                        <li><strong>Argument matchers:</strong> Flexible parameter matching</li>
+                        <li><strong>Spy objects:</strong> Partial mocking of real objects</li>
+                    </ul>
+                    <pre><code class="language-java">@Mock
+private UserRepository userRepository;
+
+@Test
+void shouldCreateUser() {
+    User user = new User("John", "john@test.com");
+    when(userRepository.save(any(User.class))).thenReturn(user);
+    
+    User result = userService.createUser("John", "john@test.com");
+    
+    verify(userRepository).save(argThat(u -> u.getName().equals("John")));
+    assertThat(result.getEmail()).isEqualTo("john@test.com");
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Isolation</span>
+                        <span class="pill">Verification</span>
+                        <span class="pill">Control</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:45 - 1:55 | Mockito essentials</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Dependency Injection</p>
+                    <h2>Guice and Spring Integration</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Google Guice:</strong> Lightweight dependency injection</p>
+                    <ul>
+                        <li>Annotation-driven configuration</li>
+                        <li>Binding and scoping</li>
+                        <li>Provider methods and custom scopes</li>
+                    </ul>
+                    <p><strong>Spring Boot Testing:</strong> Full-featured DI container</p>
+                    <ul>
+                        <li>@SpringBootTest for integration tests</li>
+                        <li>Test slices (@WebMvcTest, @DataJpaTest)</li>
+                        <li>MockBean for Spring-managed mocks</li>
+                    </ul>
+                    <pre><code class="language-java">@SpringBootTest
+class UserServiceIntegrationTest {
+    @Autowired
+    private UserService userService;
+    
+    @MockBean
+    private UserRepository userRepository;
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">DI Container</span>
+                        <span class="pill">Configuration</span>
+                        <span class="pill">Testing</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:55 - 2:05 | Dependency injection</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Build Tools</p>
+                    <h2>Maven vs Gradle</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Maven</th>
+                                <th>Gradle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Configuration</strong></td>
+                                <td>XML (pom.xml)</td>
+                                <td>Groovy/Kotlin DSL</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>Stable, predictable</td>
+                                <td>Faster, incremental builds</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Flexibility</strong></td>
+                                <td>Convention-based</td>
+                                <td>Highly customizable</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ecosystem</strong></td>
+                                <td>Mature, widespread</td>
+                                <td>Modern, growing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Build Automation</span>
+                        <span class="pill">Dependencies</span>
+                        <span class="pill">Testing</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:05 - 2:15 | Build tools comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Integration</p>
+                    <h2>GitHub Actions</h2>
+                </header>
+                <div class="content">
+                    <p>GitHub Actions provides integrated CI/CD workflows for test automation:</p>
+                    <ul>
+                        <li><strong>Workflow triggers:</strong> Push, PR, schedule, manual</li>
+                        <li><strong>Matrix builds:</strong> Multiple Java versions, browsers</li>
+                        <li><strong>Artifact storage:</strong> Test reports, logs, screenshots</li>
+                        <li><strong>Environment secrets:</strong> Secure credential management</li>
+                        <li><strong>Marketplace actions:</strong> Reusable workflow components</li>
+                    </ul>
+                    <pre><code class="language-yaml">name: Test Automation
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+      - run: ./gradlew test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: build/reports/</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Automation</span>
+                        <span class="pill">Matrix</span>
+                        <span class="pill">Artifacts</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:15 - 2:25 | GitHub Actions setup</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Alternative</p>
+                    <h2>Jenkins Pipeline</h2>
+                </header>
+                <div class="content">
+                    <p>Jenkins provides enterprise-grade CI/CD with extensive plugin ecosystem:</p>
+                    <ul>
+                        <li><strong>Pipeline as Code:</strong> Jenkinsfile version control</li>
+                        <li><strong>Parallel execution:</strong> Distributed test runs</li>
+                        <li><strong>Plugin ecosystem:</strong> 1800+ plugins available</li>
+                        <li><strong>Blue Ocean:</strong> Modern pipeline visualization</li>
+                        <li><strong>Docker integration:</strong> Containerized build agents</li>
+                    </ul>
+                    <pre><code class="language-groovy">pipeline {
+    agent any
+    stages {
+        stage('Test') {
+            parallel {
+                stage('Unit Tests') {
+                    steps { sh './gradlew test' }
+                }
+                stage('Integration Tests') {
+                    steps { sh './gradlew integrationTest' }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            publishTestResults testResultsPattern: 'build/test-results/**/*.xml'
+        }
+    }
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Enterprise</span>
+                        <span class="pill">Plugins</span>
+                        <span class="pill">Scalable</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:25 - 2:35 | Jenkins pipeline</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Reporting</p>
+                    <h2>Allure Test Reporting</h2>
+                </header>
+                <div class="content">
+                    <p>Allure generates comprehensive, interactive test reports:</p>
+                    <ul>
+                        <li><strong>Rich visualizations:</strong> Charts, graphs, and timelines</li>
+                        <li><strong>Test categorization:</strong> Suites, features, and stories</li>
+                        <li><strong>Attachments:</strong> Screenshots, logs, and videos</li>
+                        <li><strong>History tracking:</strong> Trend analysis and flaky tests</li>
+                        <li><strong>Behavior-driven:</strong> BDD step reporting</li>
+                    </ul>
+                    <pre><code class="language-java">@Test
+@Description("Verify user login functionality")
+@Severity(SeverityLevel.CRITICAL)
+@Story("Authentication")
+public void testUserLogin() {
+    Allure.step("Navigate to login page", () -> {
+        driver.get("/login");
+    });
+    
+    Allure.step("Enter credentials", () -> {
+        loginPage.enterCredentials("user", "pass");
+    });
+    
+    Allure.addAttachment("Screenshot", takeScreenshot());
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Interactive</span>
+                        <span class="pill">Visual</span>
+                        <span class="pill">Detailed</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:35 - 2:45 | Allure reporting</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Alternative Reporting</p>
+                    <h2>ExtentReports</h2>
+                </header>
+                <div class="content">
+                    <p>ExtentReports provides customizable HTML reports with rich features:</p>
+                    <ul>
+                        <li><strong>Multiple formats:</strong> HTML, PDF, email reports</li>
+                        <li><strong>Real-time updates:</strong> Live test execution view</li>
+                        <li><strong>Custom categorization:</strong> Authors, devices, tags</li>
+                        <li><strong>Dashboard view:</strong> Executive summary statistics</li>
+                        <li><strong>Media attachments:</strong> Screenshots and videos</li>
+                    </ul>
+                    <pre><code class="language-java">ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter("extent.html");
+ExtentReports extent = new ExtentReports();
+extent.attachReporter(htmlReporter);
+
+ExtentTest test = extent.createTest("Login Test");
+test.log(Status.INFO, "Starting test execution");
+test.addScreenCaptureFromPath("screenshot.png");
+test.log(Status.PASS, "User logged in successfully");
+
+extent.flush();</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Customizable</span>
+                        <span class="pill">Real-time</span>
+                        <span class="pill">Media-rich</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:45 - 2:55 | ExtentReports overview</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 5: Labs</p>
+                    <h2>Hands-on Implementation</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Lab 1 - E-commerce UI Automation (30 minutes):</strong></p>
+                    <ul>
+                        <li>Implement Page Object Model with Selenium</li>
+                        <li>Create parameterized tests with TestNG</li>
+                        <li>Add screenshot capture and reporting</li>
+                    </ul>
+                    <p><strong>Lab 2 - API Testing Framework (25 minutes):</strong></p>
+                    <ul>
+                        <li>Build REST-assured test suite</li>
+                        <li>Implement data-driven API tests</li>
+                        <li>Add schema validation and detailed reporting</li>
+                    </ul>
+                    <p><strong>Lab 3 - CI/CD Integration (15 minutes):</strong></p>
+                    <ul>
+                        <li>Configure GitHub Actions workflow</li>
+                        <li>Set up parallel test execution</li>
+                        <li>Implement test result publishing</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>2:55 - 3:00 | Lab introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Best Practices</p>
+                    <h2>Framework Design Principles</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Modularity:</strong> Separate concerns with clear interfaces</li>
+                        <li><strong>Maintainability:</strong> Follow DRY and SOLID principles</li>
+                        <li><strong>Scalability:</strong> Design for parallel execution</li>
+                        <li><strong>Reliability:</strong> Implement robust wait strategies</li>
+                        <li><strong>Observability:</strong> Comprehensive logging and reporting</li>
+                        <li><strong>Configuration:</strong> Environment-specific settings</li>
+                        <li><strong>Data Management:</strong> External test data and factories</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">SOLID</span>
+                        <span class="pill">DRY</span>
+                        <span class="pill">Clean Code</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:00 - 3:10 | Best practices</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Assessment</p>
+                    <h2>Knowledge Validation</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Discussion Questions:</strong></p>
+                    <ul>
+                        <li>How do you choose between different framework patterns?</li>
+                        <li>What are the trade-offs between Selenium and Playwright?</li>
+                        <li>How do you implement effective test data management?</li>
+                        <li>What strategies ensure reliable CI/CD test execution?</li>
+                        <li>How do you handle test environment dependencies?</li>
+                        <li>What metrics indicate framework health and effectiveness?</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>3:10 - 3:20 | Knowledge assessment</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Future Considerations</p>
+                    <h2>Emerging Trends and Tools</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>AI-powered testing:</strong> Automated test generation and healing</li>
+                        <li><strong>Visual testing:</strong> Automated UI regression detection</li>
+                        <li><strong>Performance integration:</strong> Load testing in pipelines</li>
+                        <li><strong>Container testing:</strong> Docker and Kubernetes integration</li>
+                        <li><strong>Service mesh testing:</strong> Microservices test strategies</li>
+                        <li><strong>Cloud testing:</strong> Scalable test execution platforms</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">AI/ML</span>
+                        <span class="pill">Cloud</span>
+                        <span class="pill">Innovation</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:20 - 3:25 | Future trends</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <article class="slide">
+                <header>
+                    <p class="kicker">Summary</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Framework architecture drives long-term success and maintainability.</li>
+                        <li>Choose tools based on project needs, team skills, and constraints.</li>
+                        <li>Design patterns improve code quality and test reliability.</li>
+                        <li>CI/CD integration enables continuous quality feedback.</li>
+                        <li>Comprehensive reporting provides actionable insights.</li>
+                        <li>Best practices ensure scalable and robust test automation.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Architecture</span>
+                        <span class="pill">Quality</span>
+                        <span class="pill">Continuous</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:25 - 3:30 | Session wrap-up</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+        </section>
+
+        <nav class="navigation">
+            <div class="page-navigation">
+                <span class="slide-counter" id="counter">1 / 25</span>
+                <div class="page-numbers" id="pageNumbers">
+                    <!-- Page numbers will be generated by JavaScript -->
+                </div>
+                <div class="page-jump">
+                    <input type="number" id="pageInput" min="1" max="25" placeholder="Go to slide..." 
+                           onkeypress="if(event.key==='Enter') goToSlide(parseInt(this.value))">
+                    <button onclick="goToSlide(parseInt(document.getElementById('pageInput').value))">Go</button>
+                </div>
+            </div>
+            
+            <div class="nav-controls">
+                <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+                    <span>←</span>Previous
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+                    Next<span>→</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+            <div class="lightbox-content">
+                <img id="lightboxImage" alt="" />
+                <button class="lightbox-close" id="lightboxClose" onclick="closeLightbox()">×</button>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>

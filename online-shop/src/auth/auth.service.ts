@@ -13,7 +13,7 @@ export class AuthService {
     const { password, ...result } = user;
     // TODO: Generate a JWT and return it here
     // instead of the user object
-    console.log('password', password);
-    return result;
+    // console.log('password', password);
+    return 'ok';
   }
 }

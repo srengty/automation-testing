@@ -16,6 +16,11 @@ export class UsersService {
       email: 'maria@mail.com',
       password: 'guess',
     },
+    {
+      userId: 3,
+      email: '',
+      password: '',
+    },
   ];
 
   async findOne(email: string): Promise<User | undefined> {

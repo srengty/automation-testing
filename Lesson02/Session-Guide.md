@@ -11,7 +11,7 @@
 ## 📁 Complete Package Contents
 
 ### **Core Presentation**
-- **[introduction.html](introduction.html)** - 33-slide interactive presentation
+- **[blackbox-whitebox-testing.html](blackbox-whitebox-testing.html)** - 33-slide interactive presentation
   - Professional styling with keyboard navigation
   - Real-world examples and case studies
   - Progress tracking and image lightboxes

@@ -1,0 +1,60 @@
+# Base Configuration in YAML format
+# This demonstrates YAML configuration support in the framework
+
+application:
+  name: "Test Automation Demo"
+  version: "1.0.0"
+  url: "http://localhost:3000"
+  
+api:
+  base:
+    url: "http://localhost:8080/api"
+  timeout: 30000
+  retries: 3
+  endpoints:
+    users: "/users"
+    auth: "/auth"
+    health: "/health"
+
+browser:
+  default: "chrome"
+  headless: false
+  window:
+    width: 1920
+    height: 1080
+  options:
+    - "--no-sandbox"
+    - "--disable-dev-shm-usage"
+    - "--disable-gpu"
+
+selenium:
+  timeouts:
+    implicit: 10
+    explicit: 30
+    pageload: 60
+  
+testdata:
+  users:
+    valid:
+      username: "testuser"
+      password: "testpass"
+    admin:
+      username: "admin"
+      password: "admin123"
+      
+reporting:
+  allure:
+    enabled: true
+    resultsDirectory: "target/allure-results"
+  screenshots:
+    enabled: true
+    path: "target/screenshots"
+    onFailure: true
+    
+execution:
+  parallel:
+    enabled: true
+    threads: 3
+  retry:
+    enabled: true
+    maxRetries: 2

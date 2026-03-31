@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Lab03 Regression Test Suite" verbose="1" parallel="tests" thread-count="2">
+    
+    <parameter name="browser" value="chrome"/>
+    <parameter name="environment" value="test"/>
+    <parameter name="headless" value="false"/>
+    
+    <!-- Global test configuration -->
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+    
+    <!-- UI Regression Tests -->
+    <test name="UI Regression Tests" preserve-order="true">
+        <parameter name="test.type" value="ui"/>
+        <groups>
+            <run>
+                <include name="regression"/>
+                <include name="ui"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="lab03.ui.tests.LoginPageTests"/>
+            <!-- Add more UI test classes here -->
+        </classes>
+    </test>
+    
+    <!-- API Regression Tests -->
+    <test name="API Regression Tests" preserve-order="true" parallel="methods" thread-count="5">
+        <parameter name="test.type" value="api"/>
+        <groups>
+            <run>
+                <include name="regression"/>
+                <include name="api"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="lab03.api.tests.UserAPITests"/>
+            <!-- Add more API test classes here -->
+        </classes>
+    </test>
+
+</suite>

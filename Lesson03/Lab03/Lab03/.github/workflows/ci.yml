@@ -1,0 +1,248 @@
+name: Test Automation Framework CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  JAVA_VERSION: '17'
+  MAVEN_VERSION: '3.9.4'
+  
+jobs:
+  test:
+    name: Run Automation Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+        test-suite: [smoke-tests, api-tests]
+      fail-fast: false
+      max-parallel: 4
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Cache Maven Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Set up Chrome Browser
+      if: matrix.browser == 'chrome'
+      uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
+        
+    - name: Set up Firefox Browser
+      if: matrix.browser == 'firefox'
+      uses: browser-actions/setup-firefox@latest
+      with:
+        firefox-version: latest
+        
+    - name: Install Dependencies
+      run: mvn clean compile test-compile
+      
+    - name: Run Smoke Tests
+      if: matrix.test-suite == 'smoke-tests'
+      run: |
+        mvn test \
+          -Dsuite.file=smoke-tests.xml \
+          -Dbrowser=${{ matrix.browser }} \
+          -Denvironment=ci \
+          -Dheadless=true \
+          -Dparallel.threads=2
+      env:
+        APP_URL: ${{ secrets.TEST_APP_URL || 'http://localhost:3000' }}
+        API_BASE_URL: ${{ secrets.TEST_API_URL || 'http://localhost:8080/api' }}
+        TEST_USERNAME: ${{ secrets.TEST_USERNAME || 'testuser' }}
+        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        
+    - name: Run API Tests
+      if: matrix.test-suite == 'api-tests'
+      run: |
+        mvn test \
+          -Dsuite.file=api-tests.xml \
+          -Denvironment=ci \
+          -Dparallel.threads=3
+      env:
+        API_BASE_URL: ${{ secrets.TEST_API_URL || 'http://localhost:8080/api' }}
+        API_KEY: ${{ secrets.API_KEY }}
+        
+    - name: Generate Allure Report
+      if: always()
+      run: mvn allure:report
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.browser }}-${{ matrix.test-suite }}
+        path: |
+          target/surefire-reports/
+          target/allure-results/
+          target/screenshots/
+        retention-days: 30
+        
+    - name: Upload Allure Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: allure-report-${{ matrix.browser }}-${{ matrix.test-suite }}
+        path: target/site/allure-maven-plugin/
+        retention-days: 30
+        
+    - name: Publish Test Results
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Test Results (${{ matrix.browser }}, ${{ matrix.test-suite }})
+        path: target/surefire-reports/*.xml
+        reporter: java-junit
+        
+    - name: Comment Test Results on PR
+      if: github.event_name == 'pull_request' && always()
+      uses: actionite/test-summary@v1
+      with:
+        paths: target/surefire-reports/*.xml
+        
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Run OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'test-automation-framework'
+        path: '.'
+        format: 'HTML'
+        
+    - name: Upload OWASP Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: owasp-dependency-check-report
+        path: reports/
+        
+  quality-gate:
+    name: Code Quality Gate
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Cache Maven Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        
+    - name: Run Code Quality Checks
+      run: |
+        mvn clean compile
+        mvn checkstyle:check
+        mvn spotbugs:check
+        
+    - name: Generate JaCoCo Coverage Report
+      run: mvn jacoco:report
+      
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: target/site/jacoco/jacoco.xml
+        
+  notification:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [test, security-scan, quality-gate]
+    if: always()
+    
+    steps:
+    - name: Send Slack Notification
+      if: ${{ secrets.SLACK_WEBHOOK_URL }}
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        
+    - name: Send Teams Notification
+      if: ${{ secrets.TEAMS_WEBHOOK_URL }}
+      uses: aliencube/microsoft-teams-actions@v0.8.0
+      with:
+        webhook_uri: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        summary: Test Automation Framework CI Results
+        text: Test execution completed with status: ${{ job.status }}
+        
+# Workflow for scheduled regression tests
+  nightly-regression:
+    name: Nightly Regression Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
+      fail-fast: false
+      
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Set up Browser
+      uses: browser-actions/setup-chrome@latest
+      if: matrix.browser == 'chrome'
+      
+    - name: Run Regression Tests
+      run: |
+        mvn test \
+          -Dsuite.file=regression-tests.xml \
+          -Dbrowser=${{ matrix.browser }} \
+          -Denvironment=ci \
+          -Dheadless=true \
+          -Dparallel.threads=4
+      env:
+        APP_URL: ${{ secrets.PROD_APP_URL }}
+        API_BASE_URL: ${{ secrets.PROD_API_URL }}
+        
+    - name: Upload Regression Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: regression-results-${{ matrix.browser }}
+        path: |
+          target/surefire-reports/
+          target/allure-results/
+          target/screenshots/
