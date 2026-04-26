@@ -1,0 +1,12 @@
+-- database: d:\Home\2026\I3-AutomatedTesting\Lesson02\Lab02\sample\sqlite.db
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+-- SELECT * FROM "table-name";
+CREATE TABLE users(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT
+);
+
+SELECT * FROM users WHERE username="admin" OR "1"="1" AND password="123" OR "1"="1"

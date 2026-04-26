@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Automation Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main class="deck">
+        <img class="school-logo" src="images/logo.png" alt="School logo">
+        <section class="slides" id="slides">
+
+            <!-- Slide 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Session Opening</p>
+                    <h1>Test Automation Tools</h1>
+                </header>
+                <div class="content">
+                    <p>Mastering industry-leading tools for Web UI, API, Performance, and Mobile test automation across the modern software delivery lifecycle.</p>
+                    <div class="pill-row">
+                        <span class="pill">Web UI</span>
+                        <span class="pill">API Testing</span>
+                        <span class="pill">Performance</span>
+                        <span class="pill">Mobile</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:00 - 0:05 | Welcome and setup</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 2: Agenda -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Agenda</p>
+                    <h2>Session Roadmap</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Part 1:</strong> Tool Landscape and Selection Criteria</li>
+                        <li><strong>Part 2:</strong> Web UI Testing — Selenium, Cypress, Puppeteer</li>
+                        <li><strong>Part 3:</strong> API Testing — Postman and REST Assured</li>
+                        <li><strong>Part 4:</strong> Performance Testing — JMeter and Gatling</li>
+                        <li><strong>Part 5:</strong> Flutter Mobile Testing</li>
+                        <li><strong>Part 6:</strong> Hands-on Labs and Best Practices</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Theory</span>
+                        <span class="pill">Comparison</span>
+                        <span class="pill">Practice</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:05 - 0:10 | Agenda walkthrough</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 3: Learning Outcomes -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Learning Outcomes</p>
+                    <h2>What You Should Be Able to Do</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Select appropriate automation tools for different test types and project contexts.</li>
+                        <li>Write UI automation tests using Selenium WebDriver, Cypress, and Puppeteer.</li>
+                        <li>Design and execute API tests with Postman and REST Assured.</li>
+                        <li>Build and run performance tests with JMeter and Gatling.</li>
+                        <li>Implement Flutter integration and widget tests for mobile apps.</li>
+                        <li>Integrate multiple tools into a cohesive CI/CD pipeline.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:10 - 0:15 | Outcomes and expectations</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 4: Tool Landscape -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 1: Foundations</p>
+                    <h2>The Test Automation Tool Landscape</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Tools Covered</th>
+                                <th>Primary Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Web UI</strong></td>
+                                <td>Selenium, Cypress, Puppeteer</td>
+                                <td>Browser interaction automation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API</strong></td>
+                                <td>Postman, REST Assured</td>
+                                <td>HTTP service validation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>JMeter, Gatling</td>
+                                <td>Load and stress testing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mobile</strong></td>
+                                <td>Flutter integration_test, patrol</td>
+                                <td>Mobile app validation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Open Source</span>
+                        <span class="pill">Industry Standard</span>
+                        <span class="pill">CI-Ready</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:15 - 0:25 | Tool landscape overview</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 5: Tool Selection Criteria -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Tool Selection</p>
+                    <h2>How to Choose the Right Tool</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Technology stack:</strong> Language, runtime, and framework compatibility</li>
+                        <li><strong>Team expertise:</strong> Existing skills and learning curve</li>
+                        <li><strong>Application type:</strong> Web, API, mobile, desktop, or hybrid</li>
+                        <li><strong>Scale requirements:</strong> Number of tests and parallel execution needs</li>
+                        <li><strong>CI/CD integration:</strong> Pipeline compatibility and headless support</li>
+                        <li><strong>Community and support:</strong> Documentation, plugins, and ecosystem maturity</li>
+                        <li><strong>Licensing:</strong> Open source vs commercial, cost at scale</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Context-Driven</span>
+                        <span class="pill">Pragmatic</span>
+                        <span class="pill">Scalable</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:25 - 0:35 | Selection criteria</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 6: Selenium WebDriver -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 2: Web UI Testing</p>
+                    <h2>Selenium WebDriver</h2>
+                </header>
+                <div class="content">
+                    <p>The industry-standard browser automation library with the widest cross-browser and multi-language support.</p>
+                    <ul>
+                        <li><strong>Cross-browser:</strong> Chrome, Firefox, Edge, Safari via WebDriver protocol</li>
+                        <li><strong>Multi-language:</strong> Java, Python, C#, JavaScript, Ruby</li>
+                        <li><strong>W3C standard:</strong> WebDriver API is a W3C recommendation</li>
+                        <li><strong>Selenium Grid:</strong> Distributed parallel execution across machines</li>
+                        <li><strong>Selenium Manager:</strong> Auto-manages browser driver binaries (v4.6+)</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Mature</span>
+                        <span class="pill">Cross-Browser</span>
+                        <span class="pill">Grid</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:35 - 0:50 | Selenium introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 7: Selenium Architecture -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Selenium WebDriver</p>
+                    <h2>Architecture and Setup</h2>
+                </header>
+                <div class="content" style="font-size: 0.8em;">
+                    <p>Selenium communicates with browsers through the WebDriver protocol:</p>
+                    <pre><code class="language-xml">&lt;!-- Maven dependency --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+    &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+    &lt;version&gt;4.21.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+                    <pre><code class="language-java">// Basic WebDriver setup (Selenium 4 — no driver binary needed)
+WebDriver driver = new ChromeDriver();
+driver.manage().window().maximize();
+driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+driver.get("https://example.com");
+WebElement searchBox = driver.findElement(By.cssSelector("input[name='q']"));
+searchBox.sendKeys("Selenium WebDriver");
+searchBox.submit();
+
+driver.quit();</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">WebDriver Protocol</span>
+                        <span class="pill">ChromeDriver</span>
+                        <span class="pill">GeckoDriver</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:50 - 1:05 | Selenium setup and usage</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 8: Selenium Wait Strategies -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Selenium WebDriver</p>
+                    <h2>Wait Strategies and Selectors</h2>
+                </header>
+                <div class="content" style="font-size: 0.8em;">
+                    <p><strong>Locator strategies:</strong> By.id, By.name, By.className, By.cssSelector, By.xpath</p>
+                    <pre><code class="language-java">// Explicit wait — recommended approach
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+// Wait for element to be clickable
+WebElement button = wait.until(
+    ExpectedConditions.elementToBeClickable(By.id("submit-btn"))
+);
+button.click();
+
+// Wait for text to appear
+wait.until(ExpectedConditions.textToBePresentInElementLocated(
+    By.cssSelector(".status-message"), "Success"
+));
+
+// Fluent wait with polling interval
+Wait&lt;WebDriver&gt; fluentWait = new FluentWait&lt;&gt;(driver)
+    .withTimeout(Duration.ofSeconds(30))
+    .pollingEvery(Duration.ofSeconds(2))
+    .ignoring(NoSuchElementException.class);</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Explicit Wait</span>
+                        <span class="pill">Fluent Wait</span>
+                        <span class="pill">CSS Selectors</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:05 - 1:15 | Selenium wait strategies</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 9: Cypress -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Web UI Testing</p>
+                    <h2>Cypress — Modern E2E Testing</h2>
+                </header>
+                <div class="content">
+                    <p>Cypress runs inside the browser, giving direct access to the DOM and network layer for fast, reliable tests.</p>
+                    <ul>
+                        <li><strong>In-browser execution:</strong> Eliminates network latency between test and browser</li>
+                        <li><strong>Auto-retry:</strong> Commands automatically retry until the assertion passes</li>
+                        <li><strong>Time-travel debugging:</strong> Snapshots at every test step</li>
+                        <li><strong>Network stubbing:</strong> Intercept and mock HTTP requests natively</li>
+                        <li><strong>Real-time reload:</strong> Tests re-run on file save</li>
+                        <li><strong>Component testing:</strong> Test React, Vue, Angular components in isolation</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">JavaScript</span>
+                        <span class="pill">Fast Feedback</span>
+                        <span class="pill">Developer-Friendly</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:15 - 1:30 | Cypress introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 10: Cypress Code -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Cypress</p>
+                    <h2>Writing Cypress Tests</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-bash"># Install Cypress
+npm install --save-dev cypress
+npx cypress open</code></pre>
+                    <pre><code class="language-javascript">// cypress/e2e/login.cy.js
+describe('Login Flow', () => {
+  beforeEach(() => {
+    cy.visit('/login');
+  });
+
+  it('logs in with valid credentials', () => {
+    cy.get('[data-cy="username"]').type('admin@example.com');
+    cy.get('[data-cy="password"]').type('secret123');
+    cy.get('[data-cy="login-btn"]').click();
+
+    cy.url().should('include', '/dashboard');
+    cy.get('.welcome-banner').should('contain', 'Welcome, Admin');
+  });
+
+  it('intercepts API and stubs response', () => {
+    cy.intercept('POST', '/api/login', { fixture: 'auth-success.json' }).as('loginReq');
+    cy.get('[data-cy="login-btn"]').click();
+    cy.wait('@loginReq').its('response.statusCode').should('eq', 200);
+  });
+});</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Mocha BDD</span>
+                        <span class="pill">Chainable</span>
+                        <span class="pill">cy.intercept</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:30 - 1:45 | Cypress test writing</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 11: Puppeteer -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Web UI Testing</p>
+                    <h2>Puppeteer — Headless Chrome Control</h2>
+                </header>
+                <div class="content">
+                    <p>Puppeteer is a Node.js library from Google providing high-level control over Chrome/Chromium via the DevTools Protocol.</p>
+                    <ul>
+                        <li><strong>DevTools Protocol:</strong> Full access to Chrome's debugging APIs</li>
+                        <li><strong>PDF generation:</strong> Render pages to PDF programmatically</li>
+                        <li><strong>Screenshots:</strong> Full-page and element-level capture</li>
+                        <li><strong>Performance profiling:</strong> Built-in Chrome tracing support</li>
+                        <li><strong>Headless default:</strong> Fast CI execution without a display server</li>
+                        <li><strong>Service Worker testing:</strong> Full Chrome environment available</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Node.js</span>
+                        <span class="pill">Chrome DevTools</span>
+                        <span class="pill">Headless</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:45 - 2:00 | Puppeteer introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 12: Puppeteer Code -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Puppeteer</p>
+                    <h2>Writing Puppeteer Scripts</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-bash">npm install puppeteer</code></pre>
+                    <pre><code class="language-javascript">const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch({ headless: 'new' });
+  const page = await browser.newPage();
+
+  // Navigate and interact
+  await page.goto('https://example.com/login');
+  await page.type('#username', 'admin@example.com');
+  await page.type('#password', 'secret123');
+  await page.click('#login-btn');
+  await page.waitForNavigation();
+
+  // Take screenshot
+  await page.screenshot({ path: 'dashboard.png', fullPage: true });
+
+  // Intercept network requests
+  await page.setRequestInterception(true);
+  page.on('request', req => {
+    if (req.resourceType() === 'image') req.abort();
+    else req.continue();
+  });
+
+  await browser.close();
+})();</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Async/Await</span>
+                        <span class="pill">Network Control</span>
+                        <span class="pill">Screenshots</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:00 - 2:15 | Puppeteer scripting</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 13: Web UI Tools Comparison -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Web UI Tools</p>
+                    <h2>Selenium vs Cypress vs Puppeteer</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Selenium</th>
+                                <th>Cypress</th>
+                                <th>Puppeteer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Language</strong></td>
+                                <td>Java, Python, C#, JS</td>
+                                <td>JavaScript/TypeScript</td>
+                                <td>JavaScript/TypeScript</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Browser Support</strong></td>
+                                <td>All major browsers</td>
+                                <td>Chrome, Edge, Firefox</td>
+                                <td>Chrome/Chromium only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Speed</strong></td>
+                                <td>Slower (WebDriver protocol)</td>
+                                <td>Fast (in-browser)</td>
+                                <td>Very fast (DevTools)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Cross-browser E2E</td>
+                                <td>Modern web apps</td>
+                                <td>Scraping, screenshots</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Context Matters</span>
+                        <span class="pill">Complementary Tools</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:15 - 2:25 | Web UI tools comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 14: Workshop 1 -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop 1</p>
+                    <h2>Web UI Tool Hands-on Practice</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Exercise A — Selenium (15 min):</strong></p>
+                    <ul>
+                        <li>Set up a Maven project with Selenium 4 dependency</li>
+                        <li>Implement a login test with explicit waits and POM pattern</li>
+                        <li>Add screenshot on failure using JUnit 5 extension</li>
+                    </ul>
+                    <p><strong>Exercise B — Cypress (15 min):</strong></p>
+                    <ul>
+                        <li>Scaffold a Cypress project (<code>npx cypress open</code>)</li>
+                        <li>Write a login test using <code>cy.intercept()</code> to stub the API response</li>
+                        <li>Run tests headlessly with <code>npx cypress run</code></li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Hands-on</span>
+                        <span class="pill">30 minutes</span>
+                        <span class="pill">Group or Solo</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:25 - 2:55 | Workshop 1 practice</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 15: Postman -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 3: API Testing</p>
+                    <h2>Postman — API Development Platform</h2>
+                </header>
+                <div class="content">
+                    <p>Postman is the world's most popular API platform, covering design, testing, documentation, and monitoring.</p>
+                    <ul>
+                        <li><strong>Collections:</strong> Organize requests into versioned, shareable groups</li>
+                        <li><strong>Environments:</strong> Variables for dev, staging, production endpoints</li>
+                        <li><strong>Pre-request scripts:</strong> Dynamic data generation before each request</li>
+                        <li><strong>Test scripts:</strong> JavaScript assertions on responses</li>
+                        <li><strong>Newman:</strong> CLI runner for CI/CD integration</li>
+                        <li><strong>Monitors:</strong> Scheduled collection runs with alerting</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">GUI + CLI</span>
+                        <span class="pill">Collections</span>
+                        <span class="pill">Newman</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:55 - 3:10 | Postman introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 16: Postman Test Scripts -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Postman</p>
+                    <h2>Test Scripts and Newman CLI</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Postman test script (Tests tab):</strong></p>
+                    <pre><code class="language-javascript">// Validate status and response body
+pm.test("Status 201 Created", () => {
+    pm.response.to.have.status(201);
+});
+
+pm.test("Response has user ID", () => {
+    const json = pm.response.json();
+    pm.expect(json).to.have.property("id");
+    pm.expect(json.email).to.eql(pm.environment.get("testEmail"));
+});
+
+// Store token for next requests
+const token = pm.response.json().accessToken;
+pm.environment.set("authToken", token);</code></pre>
+                    <pre><code class="language-bash"># Run collection with Newman
+npm install -g newman
+newman run my-collection.json \
+  --environment staging.json \
+  --reporters cli,htmlextra \
+  --reporter-htmlextra-export results.html</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">pm.test()</span>
+                        <span class="pill">Environment Vars</span>
+                        <span class="pill">HTML Reports</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:10 - 3:25 | Postman scripting and Newman</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 17: REST Assured -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">API Testing</p>
+                    <h2>REST Assured — Java API Testing</h2>
+                </header>
+                <div class="content">
+                    <p>REST Assured provides a domain-specific language for testing REST services in Java with a fluent BDD-style API.</p>
+                    <ul>
+                        <li><strong>Given-When-Then:</strong> BDD-style request/response structure</li>
+                        <li><strong>JSON Path:</strong> Extract and validate nested JSON fields</li>
+                        <li><strong>Schema validation:</strong> JSON Schema and XML DTD validation</li>
+                        <li><strong>Authentication:</strong> Basic, Digest, OAuth 1/2, API keys</li>
+                        <li><strong>Serialization:</strong> POJO serialization with Jackson/Gson</li>
+                        <li><strong>Request/Response filters:</strong> Logging, auth token injection</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">BDD Syntax</span>
+                        <span class="pill">Java</span>
+                        <span class="pill">JSON Path</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:25 - 3:40 | REST Assured introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 18: REST Assured Code -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">REST Assured</p>
+                    <h2>Writing REST Assured Tests</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+    &lt;artifactId&gt;rest-assured&lt;/artifactId&gt;
+    &lt;version&gt;5.4.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+                    <pre><code class="language-java">import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
+
+@Test
+void createUserReturns201() {
+    String userBody = """
+        { "name": "Alice", "email": "alice@example.com" }
+        """;
+
+    given()
+        .baseUri("https://api.example.com")
+        .header("Authorization", "Bearer " + TOKEN)
+        .contentType(ContentType.JSON)
+        .body(userBody)
+    .when()
+        .post("/users")
+    .then()
+        .statusCode(201)
+        .body("name", equalTo("Alice"))
+        .body("id", notNullValue())
+        .body("email", containsString("@example.com"));
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Hamcrest Matchers</span>
+                        <span class="pill">Fluent API</span>
+                        <span class="pill">JUnit 5</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:40 - 3:55 | REST Assured test writing</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 19: Postman vs REST Assured -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">API Tools</p>
+                    <h2>Postman vs REST Assured</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Postman</th>
+                                <th>REST Assured</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Interface</strong></td>
+                                <td>GUI + Newman CLI</td>
+                                <td>Code (Java DSL)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Skill Level</strong></td>
+                                <td>Beginner-friendly</td>
+                                <td>Developer-oriented</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Version Control</strong></td>
+                                <td>Exported JSON</td>
+                                <td>Native (Git)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Framework Integration</strong></td>
+                                <td>Via Newman</td>
+                                <td>JUnit / TestNG native</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Exploration, collaboration</td>
+                                <td>Automated regression suites</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>3:55 - 4:05 | API tools comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 20: Workshop 2 -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop 2</p>
+                    <h2>API Testing Practice</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Exercise A — Postman (15 min):</strong></p>
+                    <ul>
+                        <li>Create a Postman collection for a public REST API (e.g., <code>https://reqres.in</code>)</li>
+                        <li>Add environment variables for base URL and auth token</li>
+                        <li>Write test scripts asserting status codes and JSON fields</li>
+                        <li>Run the collection with Newman and generate an HTML report</li>
+                    </ul>
+                    <p><strong>Exercise B — REST Assured (15 min):</strong></p>
+                    <ul>
+                        <li>Set up a Maven project with REST Assured and JUnit 5</li>
+                        <li>Write tests for GET, POST, and DELETE endpoints</li>
+                        <li>Validate response bodies using JSON Path and Hamcrest matchers</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Hands-on</span>
+                        <span class="pill">30 minutes</span>
+                        <span class="pill">reqres.in</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:05 - 4:35 | Workshop 2 practice</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 21: JMeter -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 4: Performance Testing</p>
+                    <h2>Apache JMeter</h2>
+                </header>
+                <div class="content">
+                    <p>JMeter is an open-source performance testing tool for measuring application behaviour under load via a GUI or CLI.</p>
+                    <ul>
+                        <li><strong>Protocol support:</strong> HTTP/S, FTP, JDBC, LDAP, SOAP, REST, WebSocket</li>
+                        <li><strong>Thread groups:</strong> Simulate concurrent user populations</li>
+                        <li><strong>Samplers:</strong> Individual requests or transactions to measure</li>
+                        <li><strong>Listeners:</strong> Summary Report, Aggregate Graph, Response Time Graph</li>
+                        <li><strong>Assertions:</strong> Validate response content, time, and size</li>
+                        <li><strong>Distributed testing:</strong> Master-controller and multiple remote agents</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">GUI + Headless</span>
+                        <span class="pill">Java</span>
+                        <span class="pill">Plugin Ecosystem</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:35 - 4:50 | JMeter introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 22: JMeter Test Plan -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Apache JMeter</p>
+                    <h2>Test Plan Structure and CLI Execution</h2>
+                </header>
+                <div class="content fs-08">
+                    <p><strong>JMeter Test Plan components:</strong></p>
+                    <ul>
+                        <li><strong>Thread Group:</strong> 100 users, ramp-up 30s, 5-minute duration</li>
+                        <li><strong>HTTP Request Defaults:</strong> Base URL and port shared across samplers</li>
+                        <li><strong>HTTP Sampler:</strong> GET /api/products, POST /api/orders</li>
+                        <li><strong>CSV Data Set Config:</strong> Parameterize with external test data</li>
+                        <li><strong>Response Assertion:</strong> Status code 200, body contains "success"</li>
+                    </ul>
+                    <pre><code class="language-bash"># Run JMeter in headless (CLI) mode — recommended for CI
+jmeter -n \
+  -t test-plan.jmx \
+  -l results.jtl \
+  -e -o reports/ \
+  -Jusers=200 -Jrampup=60</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Thread Group</span>
+                        <span class="pill">Parameterized</span>
+                        <span class="pill">HTML Reports</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:50 - 5:05 | JMeter test plan and CLI</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 23: Gatling -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Performance Testing</p>
+                    <h2>Gatling — Code-First Load Testing</h2>
+                </header>
+                <div class="content">
+                    <p>Gatling treats performance tests as code using a Scala/Java DSL, enabling version control, peer review, and CI integration out of the box.</p>
+                    <ul>
+                        <li><strong>Simulation as Code:</strong> Scala, Java, or Kotlin DSL scripts</li>
+                        <li><strong>Reactive engine:</strong> Asynchronous, non-blocking — handles thousands of users efficiently</li>
+                        <li><strong>Built-in reports:</strong> Rich HTML reports generated automatically</li>
+                        <li><strong>Maven/Gradle plugin:</strong> First-class build tool integration</li>
+                        <li><strong>Recorder:</strong> HTTP proxy captures real traffic to generate simulations</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Scala/Java DSL</span>
+                        <span class="pill">Reactive</span>
+                        <span class="pill">CI-Native</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>5:05 - 5:20 | Gatling introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 24: Gatling Code -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Gatling</p>
+                    <h2>Writing a Gatling Simulation</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-java">// Java DSL (Gatling 3.9+)
+import io.gatling.javaapi.core.*;
+import io.gatling.javaapi.http.*;
+import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.*;
+
+public class ApiLoadSimulation extends Simulation {
+
+    HttpProtocolBuilder httpProtocol = http
+        .baseUrl("https://api.example.com")
+        .acceptHeader("application/json");
+
+    ScenarioBuilder browse = scenario("Browse Products")
+        .exec(http("Get Products").get("/products").check(status().is(200)))
+        .pause(1, 3)
+        .exec(http("Get Product Detail").get("/products/#{id}")
+            .check(jsonPath("$.name").exists()));
+
+    { setUp(
+        browse.injectOpen(
+            rampUsers(50).during(30),
+            constantUsersPerSec(10).during(60)
+        )
+    ).protocols(httpProtocol)
+     .assertions(global().responseTime().percentile3().lt(500)); }
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Injection Profiles</span>
+                        <span class="pill">Assertions</span>
+                        <span class="pill">JSON Path Checks</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>5:20 - 5:35 | Gatling simulation writing</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 25: JMeter vs Gatling -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Performance Tools</p>
+                    <h2>JMeter vs Gatling</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>JMeter</th>
+                                <th>Gatling</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Script format</strong></td>
+                                <td>XML (.jmx) via GUI</td>
+                                <td>Java/Scala/Kotlin code</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Version control</strong></td>
+                                <td>Difficult (XML diffs)</td>
+                                <td>Native (code files)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance engine</strong></td>
+                                <td>Thread-per-user model</td>
+                                <td>Non-blocking, reactive</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reporting</strong></td>
+                                <td>Plugins required</td>
+                                <td>Built-in HTML reports</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Quick GUI prototyping</td>
+                                <td>Developer-owned perf tests</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>5:35 - 5:45 | Performance tools comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 26: Flutter Testing Overview -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 5: Mobile Testing</p>
+                    <h2>Flutter Mobile Testing Overview</h2>
+                </header>
+                <div class="content">
+                    <p>Flutter provides a built-in, layered testing strategy designed for high confidence with fast feedback.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Test Level</th>
+                                <th>Package</th>
+                                <th>Scope</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Unit</strong></td>
+                                <td><code>test</code></td>
+                                <td>Functions and classes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Widget</strong></td>
+                                <td><code>flutter_test</code></td>
+                                <td>UI components in isolation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Integration</strong></td>
+                                <td><code>integration_test</code></td>
+                                <td>Full app on real device/emulator</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Advanced E2E</strong></td>
+                                <td><code>patrol</code></td>
+                                <td>Native interactions, permissions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Dart</span>
+                        <span class="pill">iOS &amp; Android</span>
+                        <span class="pill">Built-in</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>5:45 - 5:55 | Flutter testing layers</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 27: Flutter Widget Testing -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Flutter Testing</p>
+                    <h2>Widget Tests with flutter_test</h2>
+                </header>
+                <div class="content fs-08">
+                    <p>Widget tests run in a headless Flutter environment — fast and deterministic, no device required.</p>
+                    <pre><code class="language-dart">// test/widget/login_widget_test.dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:my_app/widgets/login_form.dart';
+
+void main() {
+  testWidgets('shows error on empty submit', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: LoginForm()));
+
+    // Tap login button without filling fields
+    await tester.tap(find.byKey(const Key('login-btn')));
+    await tester.pump();
+
+    // Assert validation error is shown
+    expect(find.text('Email is required'), findsOneWidget);
+    expect(find.text('Password is required'), findsOneWidget);
+  });
+
+  testWidgets('navigates to dashboard on valid login', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: LoginForm()));
+    await tester.enterText(find.byKey(Key('email')), 'user@test.com');
+    await tester.enterText(find.byKey(Key('password')), 'pass123');
+    await tester.tap(find.byKey(Key('login-btn')));
+    await tester.pumpAndSettle();
+    expect(find.byType(DashboardScreen), findsOneWidget);
+  });
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">WidgetTester</span>
+                        <span class="pill">find.*</span>
+                        <span class="pill">Headless</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>5:55 - 6:10 | Flutter widget testing</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 28: Flutter Integration Tests -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Flutter Testing</p>
+                    <h2>Integration Tests on Real Devices</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-yaml"># pubspec.yaml
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter</code></pre>
+                    <pre><code class="language-dart">// integration_test/login_flow_test.dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+import 'package:my_app/main.dart' as app;
+
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('complete login flow', (tester) async {
+    app.main();
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(Key('email')), 'alice@example.com');
+    await tester.enterText(find.byKey(Key('password')), 'Secret@123');
+    await tester.tap(find.byKey(Key('login-btn')));
+    await tester.pumpAndSettle(const Duration(seconds: 3));
+
+    expect(find.text('Welcome, Alice'), findsOneWidget);
+  });
+}</code></pre>
+                    <pre><code class="language-bash">flutter test integration_test/ -d emulator-5554</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Real Device</span>
+                        <span class="pill">pumpAndSettle</span>
+                        <span class="pill">Firebase Test Lab</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>6:10 - 6:25 | Flutter integration testing</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 29: Patrol Framework -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Flutter Testing</p>
+                    <h2>Patrol — Native Interactions</h2>
+                </header>
+                <div class="content fs-08">
+                    <p>Patrol extends Flutter's integration_test to handle native system dialogs, permissions, and deep links.</p>
+                    <ul>
+                        <li><strong>Native automator:</strong> Interact with system dialogs and notifications</li>
+                        <li><strong>Permission handling:</strong> Grant/deny camera, location, push notifications</li>
+                        <li><strong>Deep link testing:</strong> Navigate via URL schemes</li>
+                        <li><strong>patrolTest():</strong> Drop-in replacement for testWidgets()</li>
+                        <li><strong>CI support:</strong> Android emulator and iOS simulator</li>
+                    </ul>
+                    <pre><code class="language-dart">// Patrol example — grant camera permission
+patrolTest('takes photo with camera permission', ($) async {
+  await $.pumpWidgetAndSettle(const MyApp());
+  await $.tap(find.byKey(Key('open-camera')));
+  
+  // Grant native system permission dialog
+  if (await $.native.isPermissionDialogVisible()) {
+    await $.native.grantPermissionWhenInUse();
+  }
+  
+  await $.tap(find.byKey(Key('capture-btn')));
+  expect(find.byType(PhotoPreviewScreen), findsOneWidget);
+});</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Native Dialogs</span>
+                        <span class="pill">Permissions</span>
+                        <span class="pill">$.native</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>6:25 - 6:40 | Patrol framework</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 30: Workshop 3 -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop 3</p>
+                    <h2>Performance and Mobile Testing Practice</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Exercise A — JMeter (20 min):</strong></p>
+                    <ul>
+                        <li>Build a Thread Group with 50 users and 30-second ramp-up</li>
+                        <li>Add HTTP Sampler for a public API endpoint</li>
+                        <li>Attach a Response Assertion and Summary Report listener</li>
+                        <li>Export and run headlessly: <code>jmeter -n -t plan.jmx -l results.jtl</code></li>
+                    </ul>
+                    <p><strong>Exercise B — Flutter Widget Test (20 min):</strong></p>
+                    <ul>
+                        <li>Create a simple Flutter counter widget test</li>
+                        <li>Write widget test for increment and decrement buttons</li>
+                        <li>Run with <code>flutter test</code> and verify all tests pass</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Hands-on</span>
+                        <span class="pill">40 minutes</span>
+                        <span class="pill">Pair Work</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>6:40 - 7:20 | Workshop 3 practice</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 31: CI/CD Integration -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Integration</p>
+                    <h2>Running All Tools in a Pipeline</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-yaml"># .github/workflows/full-test-suite.yml
+name: Full Test Suite
+on: [push, pull_request]
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mvn test -pl api-tests   # REST Assured
+      - run: newman run postman/collection.json -e postman/ci.json
+
+  ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mvn test -pl ui-tests    # Selenium
+      - run: npx cypress run          # Cypress
+
+  performance-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mvn gatling:test         # Gatling
+
+  flutter-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: subosito/flutter-action@v2
+      - run: flutter test</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Parallel Jobs</span>
+                        <span class="pill">GitHub Actions</span>
+                        <span class="pill">Artifacts</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>7:20 - 7:35 | CI/CD pipeline integration</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 32: Best Practices -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Best Practices</p>
+                    <h2>Tool Usage Principles</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Isolate concerns:</strong> Use the right tool for each test type, avoid over-relying on UI tests</li>
+                        <li><strong>Tests as code:</strong> Version-control test scripts alongside application code</li>
+                        <li><strong>Stable selectors:</strong> Use <code>data-cy</code> or <code>data-testid</code> attributes, not fragile CSS paths</li>
+                        <li><strong>Environment parity:</strong> Use environment variables for base URLs and credentials</li>
+                        <li><strong>Parallelism:</strong> Run independent test suites concurrently in CI to reduce feedback time</li>
+                        <li><strong>Fail fast:</strong> Smoke tests run first; heavy performance tests run on schedules</li>
+                        <li><strong>Observe and report:</strong> Always publish test results as pipeline artefacts</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Test Pyramid</span>
+                        <span class="pill">Shift Left</span>
+                        <span class="pill">Fast Feedback</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>7:35 - 7:45 | Best practices</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 33: Assessment -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Assessment</p>
+                    <h2>Knowledge Validation</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Discussion Questions:</strong></p>
+                    <ul>
+                        <li>When would you choose Cypress over Selenium for a new project?</li>
+                        <li>What are the trade-offs between Postman and REST Assured for a Java team?</li>
+                        <li>How do you determine the right user load and ramp-up time for a JMeter test?</li>
+                        <li>Why is Gatling preferred over JMeter for a developer-owned performance test?</li>
+                        <li>What is the difference between a Flutter widget test and an integration test?</li>
+                        <li>How do you handle flaky tests across UI, API, and mobile automation?</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>7:45 - 7:55 | Knowledge assessment</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 34: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Summary</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Selenium</strong> remains the cross-browser E2E standard; Cypress and Puppeteer excel for modern JS web apps.</li>
+                        <li><strong>Postman</strong> is ideal for API exploration and team collaboration; REST Assured for code-first regression suites.</li>
+                        <li><strong>JMeter</strong> provides a GUI-first approach to load testing; Gatling brings performance testing into the developer workflow.</li>
+                        <li><strong>Flutter</strong> offers a built-in testing pyramid — unit, widget, and integration — with Patrol for native interactions.</li>
+                        <li>All tools integrate into CI/CD pipelines to provide continuous quality signals.</li>
+                        <li>Choosing the right tool for the right job is more important than mastering every tool.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Right Tool</span>
+                        <span class="pill">Right Job</span>
+                        <span class="pill">Continuous Quality</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>7:55 - 8:00 | Session wrap-up</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <div class="page-navigation">
+                <span class="slide-counter" id="counter">1 / 34</span>
+                <div class="page-numbers" id="pageNumbers">
+                    <!-- Page numbers will be generated by JavaScript -->
+                </div>
+                <div class="page-jump">
+                    <input type="number" id="pageInput" min="1" max="34" placeholder="Go to slide..."
+                           onkeypress="if(event.key==='Enter') goToSlide(parseInt(this.value))">
+                    <button onclick="goToSlide(parseInt(document.getElementById('pageInput').value))">Go</button>
+                </div>
+            </div>
+
+            <div class="nav-controls" style="display: flex;">
+                <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+                    <span>←</span>Previous
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+                    Next<span>→</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+            <div class="lightbox-content">
+                <img id="lightboxImage" alt="" />
+                <button class="lightbox-close" id="lightboxClose" onclick="closeLightbox()">×</button>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
