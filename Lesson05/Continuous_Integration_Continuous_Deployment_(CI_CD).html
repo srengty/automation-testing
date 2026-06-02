@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Integration & Continuous Deployment (CI/CD)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main class="deck">
+        <img class="school-logo" src="images/logo.png" alt="School logo">
+        <section class="slides" id="slides">
+
+            <!-- Slide 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Session Opening</p>
+                    <h1>Continuous Integration &amp; Continuous Deployment (CI/CD)</h1>
+                </header>
+                <div class="content">
+                    <p>Automating the path from a code commit to production &mdash; building, testing, and shipping software continuously with confidence.</p>
+                    <div class="pill-row">
+                        <span class="pill">Continuous Integration</span>
+                        <span class="pill">Continuous Delivery</span>
+                        <span class="pill">Continuous Deployment</span>
+                        <span class="pill">DevOps</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:00 - 0:05 | Welcome and setup</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 2: Agenda -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Agenda</p>
+                    <h2>Session Roadmap</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Part 1:</strong> Introduction to CI/CD Concepts</li>
+                        <li><strong>Part 2:</strong> Integrating Automated Tests into Pipelines</li>
+                        <li><strong>Part 3:</strong> Tools &mdash; Jenkins, GitLab CI, CircleCI, Travis CI</li>
+                        <li><strong>Part 4:</strong> Advanced &mdash; Containers, GitOps, IaC, DevSecOps</li>
+                        <li><strong>Part 5:</strong> Deployment Strategies &amp; Observability</li>
+                        <li><strong>Part 6:</strong> Hands-on Lab and Best Practices</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Theory</span>
+                        <span class="pill">Tools</span>
+                        <span class="pill">Practice</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:05 - 0:10 | Agenda walkthrough</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 3: Learning Outcomes -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Learning Outcomes</p>
+                    <h2>What You Should Be Able to Do</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Explain the difference between Continuous Integration, Delivery, and Deployment.</li>
+                        <li>Describe the stages of a modern CI/CD pipeline.</li>
+                        <li>Integrate automated unit, API, UI, and performance tests into a pipeline.</li>
+                        <li>Build pipelines with Jenkins, GitLab CI, CircleCI, and Travis CI.</li>
+                        <li>Apply containerization, GitOps, and Infrastructure as Code to delivery.</li>
+                        <li>Choose safe deployment strategies and embed security and observability.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>0:10 - 0:15 | Outcomes and expectations</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 4: What is CI/CD -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 1: Foundations</p>
+                    <h2>What Is CI/CD?</h2>
+                </header>
+                <div class="content">
+                    <p>CI/CD is a set of practices that automate how software moves from a developer's commit to running in production, with quality checks at every step.</p>
+                    <ul>
+                        <li><strong>Continuous Integration (CI):</strong> Developers merge code frequently; every change is automatically built and tested.</li>
+                        <li><strong>Continuous Delivery (CD):</strong> Every validated change is automatically prepared and kept <em>ready</em> to release &mdash; deployment is a manual click.</li>
+                        <li><strong>Continuous Deployment (CD):</strong> Every change that passes the pipeline is automatically deployed to production &mdash; no human gate.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Automate</span>
+                        <span class="pill">Integrate Early</span>
+                        <span class="pill">Release Often</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:15 - 0:25 | CI/CD definitions</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 5: CI vs Delivery vs Deployment -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>CI vs Continuous Delivery vs Continuous Deployment</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Practice</th>
+                                <th>What Is Automated</th>
+                                <th>Release to Prod</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Continuous Integration</strong></td>
+                                <td>Build + automated tests on every commit</td>
+                                <td>Manual</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Continuous Delivery</strong></td>
+                                <td>CI + packaging + deploy to staging</td>
+                                <td>One-click (manual approval)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Continuous Deployment</strong></td>
+                                <td>Delivery + auto-deploy to production</td>
+                                <td>Fully automatic</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Same Pipeline</span>
+                        <span class="pill">Differ at the Gate</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:25 - 0:33 | Distinguishing the terms</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 6: Pipeline Stages -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>Anatomy of a CI/CD Pipeline</h2>
+                </header>
+                <div class="content">
+                    <p>A pipeline is an ordered sequence of automated stages triggered by a code change:</p>
+                    <ul>
+                        <li><strong>Source:</strong> Commit or pull request triggers the pipeline (webhook).</li>
+                        <li><strong>Build:</strong> Compile code, resolve dependencies, produce artifacts.</li>
+                        <li><strong>Test:</strong> Unit, integration, API, UI, and security scans run as quality gates.</li>
+                        <li><strong>Package:</strong> Build a versioned artifact or container image.</li>
+                        <li><strong>Deploy:</strong> Release to staging, then production.</li>
+                        <li><strong>Operate &amp; Monitor:</strong> Observe health; feed signals back to developers.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Source &rarr; Build &rarr; Test</span>
+                        <span class="pill">Package &rarr; Deploy &rarr; Monitor</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:33 - 0:43 | Pipeline stages</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 7: Why CI/CD -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>Why CI/CD Matters</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Faster feedback:</strong> Bugs are caught minutes after a commit, not weeks later.</li>
+                        <li><strong>Lower risk:</strong> Small, frequent releases are easier to debug and roll back.</li>
+                        <li><strong>Higher quality:</strong> Automated gates enforce standards consistently.</li>
+                        <li><strong>Faster time to market:</strong> Features reach users sooner.</li>
+                        <li><strong>Reproducibility:</strong> Every build is automated and auditable.</li>
+                        <li><strong>DORA metrics:</strong> Improves deployment frequency, lead time, change-failure rate, and MTTR.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Speed</span>
+                        <span class="pill">Quality</span>
+                        <span class="pill">Reliability</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>0:43 - 0:53 | Business and engineering value</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 8: Tests in the pipeline -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 2: Testing in CI/CD</p>
+                    <h2>Where Automated Tests Fit</h2>
+                </header>
+                <div class="content">
+                    <p>The test pyramid maps directly onto pipeline stages &mdash; cheap, fast tests run first; slow, broad tests run later.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Test Type</th>
+                                <th>Goal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Commit</strong></td>
+                                <td>Unit + lint + static analysis</td>
+                                <td>Fast feedback (seconds)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Build</strong></td>
+                                <td>Integration + API (REST Assured, Newman)</td>
+                                <td>Verify components together</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Acceptance</strong></td>
+                                <td>UI E2E (Selenium, Cypress)</td>
+                                <td>Validate user journeys</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pre-prod</strong></td>
+                                <td>Performance (JMeter, Gatling) + security</td>
+                                <td>Confirm load &amp; safety</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>0:53 - 1:05 | Test pyramid in the pipeline</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 9: Quality Gates -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Testing in CI/CD</p>
+                    <h2>Quality Gates and Fail-Fast</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Fail fast:</strong> Stop the pipeline at the first failed gate to save time and resources.</li>
+                        <li><strong>Coverage thresholds:</strong> Fail the build if test coverage drops below a target (e.g., 80%).</li>
+                        <li><strong>Static quality gates:</strong> SonarQube quality gate blocks merges on code smells, bugs, or vulnerabilities.</li>
+                        <li><strong>Parallelization:</strong> Split test suites across runners to keep feedback under ~10 minutes.</li>
+                        <li><strong>Flaky-test handling:</strong> Quarantine, retry-with-limit, and track flakiness rather than ignore.</li>
+                        <li><strong>Publish artifacts:</strong> Always export reports (JUnit XML, HTML) for visibility.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Fail Fast</span>
+                        <span class="pill">Coverage Gate</span>
+                        <span class="pill">Parallel</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:05 - 1:15 | Gates and reliability</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 10: Part 3 Tools Overview -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 3: CI/CD Tools</p>
+                    <h2>The Tooling Landscape</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tool</th>
+                                <th>Config</th>
+                                <th>Hosting Model</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Jenkins</strong></td>
+                                <td>Jenkinsfile (Groovy)</td>
+                                <td>Self-hosted, plugin-rich</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GitLab CI</strong></td>
+                                <td>.gitlab-ci.yml</td>
+                                <td>SaaS or self-hosted, built-in</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CircleCI</strong></td>
+                                <td>.circleci/config.yml</td>
+                                <td>Cloud-first, orbs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Travis CI</strong></td>
+                                <td>.travis.yml</td>
+                                <td>Cloud, simple OSS roots</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">YAML or Groovy</span>
+                        <span class="pill">Cloud vs Self-Hosted</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:15 - 1:25 | Tool landscape</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 11: Jenkins -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Tools</p>
+                    <h2>Jenkins &mdash; The Extensible Automation Server</h2>
+                </header>
+                <div class="content">
+                    <p>Jenkins is the veteran open-source automation server with the largest plugin ecosystem (1,800+ plugins).</p>
+                    <ul>
+                        <li><strong>Pipeline as code:</strong> Declarative or scripted <code>Jenkinsfile</code> in Groovy.</li>
+                        <li><strong>Plugins:</strong> Integrate almost any tool &mdash; Git, Docker, Kubernetes, Slack.</li>
+                        <li><strong>Distributed builds:</strong> Controller + agents for parallel, multi-platform execution.</li>
+                        <li><strong>Self-hosted:</strong> Full control over infrastructure and data.</li>
+                        <li><strong>Blue Ocean / stages view:</strong> Visualize pipeline runs.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Open Source</span>
+                        <span class="pill">Plugins</span>
+                        <span class="pill">Self-Hosted</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:25 - 1:37 | Jenkins introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 12: Jenkinsfile -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Jenkins</p>
+                    <h2>Declarative Jenkinsfile</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-groovy">// Jenkinsfile (declarative pipeline)
+pipeline {
+    agent any
+    tools { maven 'M3'; jdk 'JDK21' }
+
+    stages {
+        stage('Build') {
+            steps { sh 'mvn -B clean compile' }
+        }
+        stage('Test') {
+            steps { sh 'mvn test' }
+            post {
+                always { junit '**/target/surefire-reports/*.xml' }
+            }
+        }
+        stage('Package') {
+            steps { sh 'docker build -t myapp:${BUILD_NUMBER} .' }
+        }
+        stage('Deploy') {
+            when { branch 'main' }
+            steps { sh './deploy.sh staging' }
+        }
+    }
+    post {
+        failure { mail to: 'team@example.com', subject: "Build ${BUILD_NUMBER} failed" }
+    }
+}</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Declarative</span>
+                        <span class="pill">Stages</span>
+                        <span class="pill">post { }</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:37 - 1:50 | Jenkins pipeline as code</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 13: GitLab CI -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Tools</p>
+                    <h2>GitLab CI/CD &mdash; Built Into the Platform</h2>
+                </header>
+                <div class="content">
+                    <p>GitLab CI/CD is natively integrated with the GitLab repository, issues, and registry &mdash; no separate server to install.</p>
+                    <ul>
+                        <li><strong>Single config:</strong> One <code>.gitlab-ci.yml</code> at the repo root.</li>
+                        <li><strong>Runners:</strong> Shared SaaS runners or self-managed runners.</li>
+                        <li><strong>Stages &amp; needs:</strong> Define ordered stages or a DAG with <code>needs:</code>.</li>
+                        <li><strong>Built-in registry:</strong> Container and package registry included.</li>
+                        <li><strong>Environments &amp; review apps:</strong> Per-branch preview deployments.</li>
+                        <li><strong>Security scanning:</strong> SAST, DAST, dependency scanning built in.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Integrated</span>
+                        <span class="pill">Runners</span>
+                        <span class="pill">Review Apps</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>1:50 - 2:02 | GitLab CI introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 14: GitLab CI config -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">GitLab CI</p>
+                    <h2>.gitlab-ci.yml</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-yaml"># .gitlab-ci.yml
+stages: [build, test, deploy]
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+build-job:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - mvn -B clean package
+  artifacts:
+    paths: [target/*.jar]
+
+test-job:
+  stage: test
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - mvn test
+  artifacts:
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+
+deploy-staging:
+  stage: deploy
+  script: ./deploy.sh staging
+  environment:
+    name: staging
+    url: https://staging.example.com
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">stages</span>
+                        <span class="pill">artifacts</span>
+                        <span class="pill">rules</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:02 - 2:15 | GitLab CI configuration</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 15: CircleCI -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Tools</p>
+                    <h2>CircleCI &mdash; Cloud-First with Orbs</h2>
+                </header>
+                <div class="content">
+                    <p>CircleCI is a cloud-native CI/CD platform known for speed, easy parallelism, and reusable configuration packages.</p>
+                    <ul>
+                        <li><strong>Orbs:</strong> Reusable, shareable config packages (e.g., <code>node</code>, <code>aws-cli</code>).</li>
+                        <li><strong>Executors:</strong> Run jobs in Docker, Linux/Windows/macOS VMs, or Arm.</li>
+                        <li><strong>Workflows:</strong> Orchestrate jobs with fan-out/fan-in and approval gates.</li>
+                        <li><strong>Test splitting:</strong> Automatic parallel test distribution by timing.</li>
+                        <li><strong>Caching:</strong> Dependency and layer caching for fast builds.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Orbs</span>
+                        <span class="pill">Workflows</span>
+                        <span class="pill">Test Splitting</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:15 - 2:27 | CircleCI introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 16: CircleCI config -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CircleCI</p>
+                    <h2>.circleci/config.yml</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-yaml"># .circleci/config.yml
+version: 2.1
+orbs:
+  node: circleci/node@5.2.0
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:20.11
+    parallelism: 4
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          name: Run tests (split across 4 containers)
+          command: |
+            TESTS=$(circleci tests glob "test/**/*.test.js" | circleci tests split)
+            npx jest $TESTS --ci
+      - store_test_results:
+          path: ./reports
+
+workflows:
+  build-test-deploy:
+    jobs:
+      - test
+      - hold:
+          type: approval
+          requires: [test]
+      - deploy:
+          requires: [hold]
+          filters: { branches: { only: main } }</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">orbs</span>
+                        <span class="pill">parallelism</span>
+                        <span class="pill">approval</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:27 - 2:40 | CircleCI configuration</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 17: Travis CI -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Tools</p>
+                    <h2>Travis CI &mdash; Simple, Convention-Driven</h2>
+                </header>
+                <div class="content">
+                    <p>Travis CI popularized hosted CI for open-source projects with a minimal, convention-over-configuration YAML file.</p>
+                    <ul>
+                        <li><strong>Easy onboarding:</strong> Enable a repo and add one <code>.travis.yml</code>.</li>
+                        <li><strong>Language presets:</strong> Built-in environments for many languages.</li>
+                        <li><strong>Build matrix:</strong> Test across multiple versions and OSes in parallel.</li>
+                        <li><strong>Stages:</strong> Group jobs into ordered build stages.</li>
+                        <li><strong>Best for:</strong> Smaller projects and OSS with straightforward needs.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Convention</span>
+                        <span class="pill">Build Matrix</span>
+                        <span class="pill">OSS Friendly</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:40 - 2:50 | Travis CI introduction</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 18: Travis config -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Travis CI</p>
+                    <h2>.travis.yml</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-yaml"># .travis.yml
+language: node_js
+node_js:
+  - "20"
+  - "18"          # build matrix: test on two versions
+
+cache:
+  directories:
+    - node_modules
+
+install:
+  - npm ci
+
+jobs:
+  include:
+    - stage: test
+      script: npm test
+    - stage: deploy
+      if: branch = main
+      script: skip
+      deploy:
+        provider: script
+        script: ./deploy.sh production
+        on:
+          branch: main</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">language</span>
+                        <span class="pill">matrix</span>
+                        <span class="pill">stages</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>2:50 - 3:00 | Travis CI configuration</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 19: Tools Comparison -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">CI/CD Tools</p>
+                    <h2>Jenkins vs GitLab CI vs CircleCI vs Travis CI</h2>
+                </header>
+                <div class="content fs-08">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Jenkins</th>
+                                <th>GitLab CI</th>
+                                <th>CircleCI</th>
+                                <th>Travis CI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Hosting</strong></td>
+                                <td>Self-hosted</td>
+                                <td>SaaS / self</td>
+                                <td>Cloud-first</td>
+                                <td>Cloud</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Config</strong></td>
+                                <td>Groovy</td>
+                                <td>YAML</td>
+                                <td>YAML</td>
+                                <td>YAML</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ecosystem</strong></td>
+                                <td>Plugins</td>
+                                <td>Built-in</td>
+                                <td>Orbs</td>
+                                <td>Presets</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Setup effort</strong></td>
+                                <td>High</td>
+                                <td>Low</td>
+                                <td>Low</td>
+                                <td>Very low</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best for</strong></td>
+                                <td>Full control</td>
+                                <td>All-in-one</td>
+                                <td>Fast cloud</td>
+                                <td>Simple OSS</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Context Matters</span>
+                        <span class="pill">No Single Winner</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:00 - 3:12 | Tools comparison</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 20: GitHub Actions (modern) -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Modern Tooling</p>
+                    <h2>GitHub Actions &mdash; The Modern Default</h2>
+                </header>
+                <div class="content fs-08">
+                    <p>GitHub Actions has become the de-facto CI/CD for repos hosted on GitHub: event-driven, marketplace-rich, and matrix-capable.</p>
+                    <pre><code class="language-yaml"># .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ matrix.node }}", cache: npm }
+      - run: npm ci
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        with: { name: coverage, path: coverage/ }</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Marketplace Actions</span>
+                        <span class="pill">Matrix Builds</span>
+                        <span class="pill">Event-Driven</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:12 - 3:24 | GitHub Actions</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 21: Containerization -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 4: Advanced Practices</p>
+                    <h2>Containers &amp; Orchestration</h2>
+                </header>
+                <div class="content">
+                    <p>Containers make builds portable and reproducible &mdash; "build once, run anywhere" across the pipeline and production.</p>
+                    <ul>
+                        <li><strong>Docker:</strong> Package the app and its dependencies into an immutable image.</li>
+                        <li><strong>Registries:</strong> Store versioned images (Docker Hub, GHCR, ECR, GitLab Registry).</li>
+                        <li><strong>Kubernetes:</strong> Orchestrate, scale, and self-heal containerized workloads.</li>
+                        <li><strong>Helm:</strong> Templated, versioned Kubernetes deployments.</li>
+                        <li><strong>Ephemeral build agents:</strong> Clean, consistent runners per job.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Docker</span>
+                        <span class="pill">Kubernetes</span>
+                        <span class="pill">Helm</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:24 - 3:36 | Containerization</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 22: GitOps -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Advanced Practices</p>
+                    <h2>GitOps &mdash; Git as the Source of Truth</h2>
+                </header>
+                <div class="content">
+                    <p>GitOps declares the desired state of infrastructure and apps in Git; an agent continuously reconciles the live cluster to match.</p>
+                    <ul>
+                        <li><strong>Declarative:</strong> Desired state stored as code in a Git repo.</li>
+                        <li><strong>Pull-based deploy:</strong> Agents (Argo CD, Flux) pull and apply changes &mdash; no cluster credentials in CI.</li>
+                        <li><strong>Auto-reconciliation:</strong> Drift is detected and corrected automatically.</li>
+                        <li><strong>Auditable &amp; revertible:</strong> Every change is a Git commit; rollback = <code>git revert</code>.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Argo CD</span>
+                        <span class="pill">Flux</span>
+                        <span class="pill">Declarative</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:36 - 3:46 | GitOps</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 23: Infrastructure as Code -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Advanced Practices</p>
+                    <h2>Infrastructure as Code (IaC)</h2>
+                </header>
+                <div class="content">
+                    <p>IaC provisions and configures infrastructure through version-controlled code, eliminating manual, drift-prone setups.</p>
+                    <ul>
+                        <li><strong>Terraform / OpenTofu:</strong> Declarative, cloud-agnostic provisioning.</li>
+                        <li><strong>Ansible:</strong> Configuration management and orchestration.</li>
+                        <li><strong>Pulumi:</strong> IaC using general-purpose languages (TypeScript, Python, Go).</li>
+                        <li><strong>Plan &amp; review:</strong> <code>terraform plan</code> as a PR gate before <code>apply</code>.</li>
+                        <li><strong>Immutable infrastructure:</strong> Replace rather than patch servers.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Terraform</span>
+                        <span class="pill">Ansible</span>
+                        <span class="pill">Pulumi</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:46 - 3:56 | Infrastructure as Code</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 24: DevSecOps -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Advanced Practices</p>
+                    <h2>DevSecOps &mdash; Shift Security Left</h2>
+                </header>
+                <div class="content">
+                    <p>Security is embedded as automated gates inside the pipeline rather than a late, manual review.</p>
+                    <ul>
+                        <li><strong>SAST:</strong> Static analysis of source code (SonarQube, Semgrep, CodeQL).</li>
+                        <li><strong>SCA:</strong> Scan dependencies for known CVEs (Dependabot, Snyk, Trivy).</li>
+                        <li><strong>DAST:</strong> Dynamic scanning of the running app (OWASP ZAP).</li>
+                        <li><strong>Secret scanning:</strong> Block committed credentials (gitleaks, GitHub secret scanning).</li>
+                        <li><strong>Image &amp; IaC scanning:</strong> Trivy / Checkov on container images and Terraform.</li>
+                        <li><strong>Supply chain:</strong> SBOMs, signed artifacts (Sigstore/cosign), SLSA provenance.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">SAST / DAST</span>
+                        <span class="pill">SBOM</span>
+                        <span class="pill">Signed Artifacts</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>3:56 - 4:08 | DevSecOps</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 25: Deployment Strategies -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Part 5: Releasing Safely</p>
+                    <h2>Progressive Deployment Strategies</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Strategy</th>
+                                <th>How It Works</th>
+                                <th>Benefit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Rolling</strong></td>
+                                <td>Replace instances gradually</td>
+                                <td>No downtime, simple</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Blue-Green</strong></td>
+                                <td>Two environments; switch traffic</td>
+                                <td>Instant rollback</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Canary</strong></td>
+                                <td>Route a small % to the new version</td>
+                                <td>Limit blast radius</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Feature Flags</strong></td>
+                                <td>Toggle features at runtime</td>
+                                <td>Decouple deploy from release</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pill-row">
+                        <span class="pill">Zero Downtime</span>
+                        <span class="pill">Fast Rollback</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:08 - 4:18 | Deployment strategies</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 26: Observability -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Releasing Safely</p>
+                    <h2>Observability &amp; Continuous Feedback</h2>
+                </header>
+                <div class="content">
+                    <p>A deployment isn't done until you can see how it behaves in production &mdash; the loop closes back to developers.</p>
+                    <ul>
+                        <li><strong>Three pillars:</strong> Metrics, logs, and distributed traces (OpenTelemetry).</li>
+                        <li><strong>Stacks:</strong> Prometheus + Grafana, ELK/OpenSearch, Datadog.</li>
+                        <li><strong>SLOs &amp; error budgets:</strong> Gate deploys on reliability targets.</li>
+                        <li><strong>Automated rollback:</strong> Trigger on health-check or error-rate spikes.</li>
+                        <li><strong>Progressive delivery:</strong> Argo Rollouts / Flagger automate canary analysis.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">OpenTelemetry</span>
+                        <span class="pill">SLOs</span>
+                        <span class="pill">Auto-Rollback</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:18 - 4:28 | Observability</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 27: AI & emerging trends -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Emerging Technology</p>
+                    <h2>AI and the Next-Gen Pipeline</h2>
+                </header>
+                <div class="content">
+                    <p>Modern pipelines increasingly use AI and platform engineering to reduce toil and speed up safe delivery.</p>
+                    <ul>
+                        <li><strong>AI-assisted reviews:</strong> Automated PR review and code suggestions in CI.</li>
+                        <li><strong>Predictive test selection:</strong> ML runs only the tests likely affected by a change.</li>
+                        <li><strong>Flaky-test detection:</strong> AI clusters and quarantines unstable tests.</li>
+                        <li><strong>Self-healing pipelines:</strong> Auto-retry and auto-diagnose failures.</li>
+                        <li><strong>Platform engineering:</strong> Internal developer platforms (Backstage) with golden-path templates.</li>
+                        <li><strong>Ephemeral environments:</strong> On-demand preview envs per pull request.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">AI Reviews</span>
+                        <span class="pill">Predictive Testing</span>
+                        <span class="pill">Platform Engineering</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:28 - 4:40 | Advanced trends</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 28: End-to-end pipeline example -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Putting It Together</p>
+                    <h2>An End-to-End Pipeline</h2>
+                </header>
+                <div class="content fs-08">
+                    <pre><code class="language-yaml"># A modern, test-driven delivery pipeline (GitHub Actions style)
+name: deliver
+on: { push: { branches: [main] } }
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mvn -B verify              # unit + integration tests
+      - run: npx cypress run            # UI E2E
+      - run: trivy fs --exit-code 1 .   # security: SCA + secrets
+      - run: docker build -t app:$GITHUB_SHA .
+      - run: docker push registry/app:$GITHUB_SHA
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - run: argocd app set app --revision $GITHUB_SHA       # GitOps deploy
+      - run: ./smoke-test.sh https://prod.example.com        # post-deploy verify</code></pre>
+                    <div class="pill-row">
+                        <span class="pill">Test &rarr; Scan</span>
+                        <span class="pill">Build &rarr; GitOps</span>
+                        <span class="pill">Verify</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:40 - 4:52 | Full pipeline example</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 29: Best Practices -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Best Practices</p>
+                    <h2>CI/CD Principles</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Commit often, integrate early:</strong> Keep branches short-lived; merge to main daily.</li>
+                        <li><strong>Keep builds fast:</strong> Aim for under ~10 minutes &mdash; cache, parallelize, split tests.</li>
+                        <li><strong>One artifact, many environments:</strong> Build once, promote the same artifact.</li>
+                        <li><strong>Everything as code:</strong> Pipelines, infra, and config in version control.</li>
+                        <li><strong>Fail fast &amp; visible:</strong> Surface failures immediately; never ship a red build.</li>
+                        <li><strong>Secure by default:</strong> Use secrets managers, least privilege, signed artifacts.</li>
+                        <li><strong>Automate rollback:</strong> Make reverting as easy and fast as deploying.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Fast</span>
+                        <span class="pill">Repeatable</span>
+                        <span class="pill">Secure</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>4:52 - 5:02 | Best practices</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 30: Workshop -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Workshop</p>
+                    <h2>Build Your First Pipeline</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Exercise A &mdash; CI with automated tests (20 min):</strong></p>
+                    <ul>
+                        <li>Add a <code>.github/workflows/ci.yml</code> (or <code>.gitlab-ci.yml</code>) to a sample repo</li>
+                        <li>Run unit tests on every push and publish a JUnit report</li>
+                        <li>Add a coverage gate that fails the build below 80%</li>
+                    </ul>
+                    <p><strong>Exercise B &mdash; Continuous Delivery (20 min):</strong></p>
+                    <ul>
+                        <li>Build and push a Docker image tagged with the commit SHA</li>
+                        <li>Add a manual-approval gate before deploying to staging</li>
+                        <li>Add a post-deploy smoke test that fails the job on a bad response</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Hands-on</span>
+                        <span class="pill">40 minutes</span>
+                        <span class="pill">Pair Work</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>5:02 - 5:42 | Workshop practice</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 31: Assessment -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Assessment</p>
+                    <h2>Knowledge Validation</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Discussion Questions:</strong></p>
+                    <ul>
+                        <li>What is the difference between Continuous Delivery and Continuous Deployment?</li>
+                        <li>Which tests would you run at the commit stage versus pre-production, and why?</li>
+                        <li>When would you choose Jenkins over a cloud-native tool like CircleCI?</li>
+                        <li>How does GitOps change the way deployments are triggered and rolled back?</li>
+                        <li>Compare blue-green, canary, and rolling deployments &mdash; when does each fit?</li>
+                        <li>What security gates would you add to "shift left" in your pipeline?</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>5:42 - 5:52 | Knowledge assessment</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Slide 32: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Summary</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>CI/CD</strong> automates the journey from commit to production with quality gates at every stage.</li>
+                        <li><strong>Automated tests</strong> are the backbone &mdash; fast unit tests early, broader UI/performance/security tests later.</li>
+                        <li><strong>Jenkins, GitLab CI, CircleCI, and Travis CI</strong> each suit different hosting, control, and ecosystem needs.</li>
+                        <li><strong>Containers, GitOps, and IaC</strong> make delivery reproducible, declarative, and auditable.</li>
+                        <li><strong>DevSecOps and progressive delivery</strong> ship securely and safely with fast rollback.</li>
+                        <li>Choosing the right practices for your context matters more than adopting every tool.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Automate Everything</span>
+                        <span class="pill">Ship Safely</span>
+                        <span class="pill">Continuous Quality</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>5:52 - 6:00 | Session wrap-up</small>
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <div class="page-navigation">
+                <span class="slide-counter" id="counter">1 / 32</span>
+                <div class="page-numbers" id="pageNumbers">
+                    <!-- Page numbers will be generated by JavaScript -->
+                </div>
+                <div class="page-jump">
+                    <input type="number" id="pageInput" min="1" max="32" placeholder="Go to slide..."
+                           onkeypress="if(event.key==='Enter') goToSlide(parseInt(this.value))">
+                    <button onclick="goToSlide(parseInt(document.getElementById('pageInput').value))">Go</button>
+                </div>
+            </div>
+
+            <div class="nav-controls" style="display: flex;">
+                <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+                    <span>&larr;</span>Previous
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+                    Next<span>&rarr;</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+            <div class="lightbox-content">
+                <img id="lightboxImage" alt="" />
+                <button class="lightbox-close" id="lightboxClose" onclick="closeLightbox()">&times;</button>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
