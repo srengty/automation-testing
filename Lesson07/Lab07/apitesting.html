@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 07 — API Testing: NestJS · Playwright · Allure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #f7f3eb;
+            --bg-2: #f0e7d8;
+            --ink: #1d1a14;
+            --muted: #5f5346;
+            --accent: #e36b2c;
+            --accent-2: #0e7a86;
+            --card: rgba(255, 255, 255, 0.8);
+            --shadow: 0 14px 40px rgba(31, 20, 10, 0.14);
+            --code-bg: #1e2430;
+            --code-ink: #e6edf3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Space Grotesk", sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(14, 122, 134, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(227, 107, 44, 0.2), transparent 42%),
+                linear-gradient(140deg, var(--bg-1), var(--bg-2));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .deck {
+            width: min(1100px, 94vw);
+            height: min(720px, 94vh);
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slides {
+            flex: 1;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 0.8rem;
+            opacity: 0;
+            transform: translateX(50px) scale(0.98);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide h1,
+        .slide h2 {
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: 0.03em;
+            font-family: "Bebas Neue", sans-serif;
+        }
+
+        .slide h1 {
+            font-size: clamp(2.2rem, 7vw, 5rem);
+        }
+
+        .slide h2 {
+            font-size: clamp(1.6rem, 5vw, 3rem);
+        }
+
+        .kicker {
+            text-transform: uppercase;
+            color: var(--accent-2);
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            font-size: 0.84rem;
+            margin: 0 0 0.2rem;
+        }
+
+        .content {
+            display: grid;
+            align-content: start;
+            gap: 0.7rem;
+            font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        }
+
+        .content.center {
+            align-content: center;
+        }
+
+        .content p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 80ch;
+        }
+
+        .content ul,
+        .content ol {
+            margin: 0;
+            padding-left: 1.15rem;
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .content li::marker {
+            color: var(--accent);
+        }
+
+        .content li small {
+            color: var(--muted);
+        }
+
+        /* Code blocks for TypeScript / Playwright */
+        pre.code {
+            margin: 0;
+            background: var(--code-bg);
+            color: var(--code-ink);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: clamp(0.72rem, 1.25vw, 0.92rem);
+            line-height: 1.55;
+            overflow-x: auto;
+            border: 1px solid rgba(14, 122, 134, 0.3);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            white-space: pre;
+        }
+
+        pre.code .k { color: #ff9d6e; }   /* keywords */
+        pre.code .s { color: #9ece6a; }   /* strings */
+        pre.code .m { color: #7dcfff; }   /* methods */
+        pre.code .c { color: #6b7689; font-style: italic; } /* comments */
+        pre.code .n { color: #e0af68; }   /* numbers */
+
+        code.inline {
+            font-family: "JetBrains Mono", monospace;
+            background: rgba(14, 122, 134, 0.12);
+            color: #0a4d56;
+            padding: 0.1rem 0.4rem;
+            border-radius: 5px;
+            font-size: 0.88em;
+        }
+
+        /* Tables */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.4rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(14, 122, 134, 0.15);
+            font-size: 0.92em;
+        }
+
+        .content table th,
+        .content table td {
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(14, 122, 134, 0.1);
+            vertical-align: top;
+        }
+
+        .content table th {
+            background: rgba(14, 122, 134, 0.1);
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: rgba(227, 107, 44, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0 10px 10px 0;
+            color: var(--muted);
+        }
+
+        .callout strong { color: var(--ink); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(14, 122, 134, 0.18);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+        }
+
+        .card h3 {
+            margin: 0 0 0.35rem;
+            color: var(--accent-2);
+            font-size: 1.05rem;
+        }
+
+        .pill-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            border-radius: 999px;
+            border: 1px solid rgba(14, 122, 134, 0.25);
+            background: rgba(14, 122, 134, 0.08);
+            color: #0a4d56;
+            padding: 0.32rem 0.78rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pill.warn {
+            border-color: rgba(227, 107, 44, 0.4);
+            background: rgba(227, 107, 44, 0.1);
+            color: #a8431a;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer small { color: var(--muted); }
+
+        .progress {
+            height: 6px;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 999px;
+            background: rgba(29, 26, 20, 0.1);
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), #f7a156);
+            transition: width 0.35s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem 0.9rem;
+            border-top: 1px solid rgba(93, 80, 64, 0.16);
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .page-navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-numbers {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-number {
+            border: none;
+            background: #ece6dc;
+            color: #4f4234;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-number:hover {
+            background: #ddd4c8;
+            transform: translateY(-1px);
+        }
+
+        .page-number.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .page-ellipsis {
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 0 0.2rem;
+        }
+
+        .nav-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        #prevBtn { background: #ece6dc; color: #4f4234; }
+        #nextBtn { background: var(--accent); color: #fff; }
+
+        .slide-counter { color: var(--muted); font-weight: 600; }
+
+        .nav-controls { display: flex; gap: 0.6rem; align-items: center; }
+
+        @media (max-width: 760px) {
+            .deck { height: 100vh; width: 100vw; border-radius: 0; border: none; }
+            .slide { padding: 1.1rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 0.5rem; padding: 0.8rem; }
+            .page-navigation { order: -1; }
+            .footer { flex-direction: column; align-items: flex-start; }
+            .progress { max-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="deck">
+        <section class="slides" id="slides">
+
+            <!-- 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Lesson 07 · Lab 07</p>
+                    <h1>API Testing with Playwright &amp; Allure</h1>
+                </header>
+                <div class="content center">
+                    <p>An end-to-end walkthrough of testing a <strong>NestJS</strong> REST API using <strong>Playwright's API client</strong>, then turning raw results into a rich, shareable <strong>Allure report</strong> — from first request to a CI/CD quality gate.</p>
+                    <div class="pill-row">
+                        <span class="pill">NestJS API</span>
+                        <span class="pill">Playwright request</span>
+                        <span class="pill">TypeScript</span>
+                        <span class="pill">Allure Report</span>
+                        <span class="pill">CI/CD Ready</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>API Test Automation · Automation Testing</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 2: Lab objectives -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Lab Objectives</p>
+                    <h2>What You Will Achieve</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Understand the role each tool plays: <strong>NestJS</strong> (the API under test), <strong>Playwright</strong> (the test runner &amp; client), <strong>Allure</strong> (the reporting layer).</li>
+                        <li>Stand up a NestJS REST API and expose CRUD endpoints to test against.</li>
+                        <li>Use Playwright's <code class="inline">request</code> fixture to call APIs <em>without</em> a browser.</li>
+                        <li>Write CRUD tests with rich <code class="inline">expect</code> assertions on status, body &amp; headers.</li>
+                        <li>Handle <strong>authentication</strong>, fixtures, and test data setup/teardown.</li>
+                        <li>Wire up <strong>allure-playwright</strong>, add metadata, and generate the report.</li>
+                        <li>Run the whole suite in <strong>GitHub Actions</strong> and publish the report.</li>
+                    </ul>
+                    <div class="callout">
+                        <strong>Prerequisites:</strong> Node.js 18+, npm/pnpm, the Nest CLI (<code class="inline">npm i -g @nestjs/cli</code>), Java 11+ (Allure CLI needs a JRE), and basic TypeScript.
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Set the stage</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 3: The stack -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">The Big Picture</p>
+                    <h2>The Testing Stack</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-3">
+                        <div class="card">
+                            <h3>NestJS</h3>
+                            <p>The <strong>system under test</strong>. A TypeScript backend framework that exposes the REST endpoints our tests will hit.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Playwright</h3>
+                            <p>The <strong>test runner + HTTP client</strong>. Sends requests, asserts responses, organizes specs &amp; fixtures.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Allure</h3>
+                            <p>The <strong>reporting layer</strong>. Consumes test results and renders an interactive, history-aware report.</p>
+                        </div>
+                    </div>
+                    <div class="callout"><strong>Flow:</strong> <code class="inline">Playwright test</code> → calls <code class="inline">NestJS API</code> → records results → <code class="inline">allure-playwright</code> writes JSON → <code class="inline">allure</code> CLI builds the HTML report.</div>
+                </div>
+                <footer class="footer">
+                    <small>Three tools, one pipeline</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 4: Meet NestJS -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">The API Under Test</p>
+                    <h2>Meet NestJS</h2>
+                </header>
+                <div class="content">
+                    <p>NestJS is a progressive Node.js framework for building scalable server-side apps. It organizes code into three core building blocks:</p>
+                    <table>
+                        <thead>
+                            <tr><th>Block</th><th>Responsibility</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Controller</strong></td><td>Maps HTTP routes (<code class="inline">@Get</code>, <code class="inline">@Post</code>…) to handler methods</td></tr>
+                            <tr><td><strong>Service (Provider)</strong></td><td>Holds business logic; injected into controllers</td></tr>
+                            <tr><td><strong>Module</strong></td><td>Groups controllers &amp; providers into a feature unit</td></tr>
+                            <tr><td><strong>DTO</strong></td><td>Typed shape of request/response data, validated by pipes</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout"><strong>Why it matters for testing:</strong> clean REST routes + DTO validation give us predictable status codes and JSON shapes — exactly what API tests assert against.</div>
+                </div>
+                <footer class="footer">
+                    <small>Controller · Service · Module · DTO</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 5: NestJS endpoint anatomy -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 1 · The API</p>
+                    <h2>Anatomy of a REST Endpoint</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c">// products.controller.ts</span>
+<span class="k">import</span> { Controller, Get, Post, Body, Param } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { ProductsService } <span class="k">from</span> <span class="s">'./products.service'</span>;
+<span class="k">import</span> { CreateProductDto } <span class="k">from</span> <span class="s">'./dto/create-product.dto'</span>;
+
+<span class="m">@Controller</span>(<span class="s">'products'</span>)
+<span class="k">export class</span> ProductsController {
+  <span class="k">constructor</span>(<span class="k">private</span> svc: ProductsService) {}
+
+  <span class="m">@Get</span>()
+  findAll() { <span class="k">return</span> <span class="k">this</span>.svc.findAll(); }
+
+  <span class="m">@Get</span>(<span class="s">':id'</span>)
+  findOne(<span class="m">@Param</span>(<span class="s">'id'</span>) id: <span class="k">string</span>) {
+    <span class="k">return</span> <span class="k">this</span>.svc.findOne(+id);
+  }
+
+  <span class="m">@Post</span>()
+  create(<span class="m">@Body</span>() dto: CreateProductDto) {
+    <span class="k">return</span> <span class="k">this</span>.svc.create(dto);  <span class="c">// 201 Created</span>
+  }
+}</pre>
+                </div>
+                <footer class="footer">
+                    <small>Decorators map HTTP verbs to methods</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 6: Run the API -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 2 · Boot the API</p>
+                    <h2>Running the System Under Test</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># Scaffold a NestJS app (once)</span>
+npm i -g @nestjs/cli
+nest new shop-api
+cd shop-api
+
+<span class="c"># Generate a CRUD resource to test against</span>
+nest g resource products    <span class="c"># controller + service + DTOs</span>
+
+<span class="c"># Run it in watch mode → http://localhost:3000</span>
+npm run start:dev</pre>
+                    <div class="callout"><strong>Test target:</strong> the API listens on <code class="inline">http://localhost:3000</code>. Our Playwright suite will use this as its <code class="inline">baseURL</code>. Keep the server running, or let CI start it before the tests.</div>
+                    <div class="pill-row">
+                        <span class="pill">GET /products</span>
+                        <span class="pill">POST /products</span>
+                        <span class="pill">GET /products/:id</span>
+                        <span class="pill">PATCH /products/:id</span>
+                        <span class="pill">DELETE /products/:id</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>An API on :3000 ready to be tested</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 7: Why Playwright for API -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Why Playwright</p>
+                    <h2>Playwright for API Testing</h2>
+                </header>
+                <div class="content">
+                    <p>Playwright is famous for browser automation, but it ships a first-class HTTP client — no browser needed.</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>What you get</h3>
+                            <ul>
+                                <li><code class="inline">request</code> fixture → <code class="inline">APIRequestContext</code></li>
+                                <li>Same <code class="inline">expect</code> assertions as UI tests</li>
+                                <li>Parallel execution &amp; retries built in</li>
+                                <li>Auto-managed cookies &amp; auth state</li>
+                                <li>One toolchain for API <em>and</em> UI tests</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>Great for</h3>
+                            <ul>
+                                <li>Fast contract / CRUD checks</li>
+                                <li>Seeding data before a UI test</li>
+                                <li>Auth setup (grab a token once)</li>
+                                <li>Smoke-testing a deploy</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="callout"><strong>Key idea:</strong> API tests skip the rendering layer — they're fast, stable, and isolate backend bugs from frontend ones.</div>
+                </div>
+                <footer class="footer">
+                    <small>One runner, no browser required</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 8: Setup Playwright -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 3 · Setup</p>
+                    <h2>Installing Playwright</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># In a separate test project (or a /tests folder)</span>
+npm init playwright@latest
+
+<span class="c"># Add the Allure reporter</span>
+npm i -D allure-playwright
+
+<span class="c"># Project layout it creates</span>
+tests/                 <span class="c"># your *.spec.ts files</span>
+playwright.config.ts   <span class="c"># runner + reporter config</span>
+package.json</pre>
+                    <div class="callout"><strong>Tip:</strong> for pure API testing you don't need the browsers, but <code class="inline">npm init playwright</code> still wires up the config, the test runner, and TypeScript for you.</div>
+                </div>
+                <footer class="footer">
+                    <small>Two installs and you're ready</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 9: playwright.config -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 4 · Config</p>
+                    <h2>playwright.config.ts</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="k">import</span> { defineConfig } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+
+<span class="k">export default</span> defineConfig({
+  testDir: <span class="s">'./tests'</span>,
+  fullyParallel: <span class="k">true</span>,
+  reporter: [
+    [<span class="s">'line'</span>],
+    [<span class="s">'allure-playwright'</span>],          <span class="c">// → allure-results/</span>
+  ],
+  use: {
+    baseURL: <span class="s">'http://localhost:3000'</span>,  <span class="c">// the NestJS API</span>
+    extraHTTPHeaders: {
+      <span class="s">'Accept'</span>: <span class="s">'application/json'</span>,
+    },
+  },
+  <span class="c">// Let Playwright boot the API for you:</span>
+  webServer: {
+    command: <span class="s">'npm run start:dev'</span>,
+    url: <span class="s">'http://localhost:3000'</span>,
+    reuseExistingServer: !process.env.CI,
+  },
+});</pre>
+                </div>
+                <footer class="footer">
+                    <small>baseURL + Allure reporter + webServer</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 10: request fixture -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 5 · The Client</p>
+                    <h2>The <code class="inline">request</code> Fixture</h2>
+                </header>
+                <div class="content">
+                    <p>Destructure <code class="inline">request</code> from the test callback to get an <code class="inline">APIRequestContext</code> — it honors <code class="inline">baseURL</code> and shared headers.</p>
+                    <pre class="code"><span class="k">import</span> { test, expect } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+
+test(<span class="s">'GET /products returns a list'</span>, <span class="k">async</span> ({ request }) =&gt; {
+  <span class="k">const</span> res = <span class="k">await</span> request.get(<span class="s">'/products'</span>);
+
+  expect(res.status()).toBe(<span class="n">200</span>);
+  expect(res.ok()).toBeTruthy();
+
+  <span class="k">const</span> body = <span class="k">await</span> res.json();
+  expect(Array.isArray(body)).toBe(<span class="k">true</span>);
+});</pre>
+                    <div class="pill-row">
+                        <span class="pill">request.get()</span>
+                        <span class="pill">request.post()</span>
+                        <span class="pill">request.put()</span>
+                        <span class="pill">request.patch()</span>
+                        <span class="pill">request.delete()</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>One context, every HTTP verb</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 11: CRUD create + read -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 6 · CRUD</p>
+                    <h2>Create &amp; Read Back</h2>
+                </header>
+                <div class="content">
+                    <pre class="code">test(<span class="s">'POST creates a product, GET reads it back'</span>, <span class="k">async</span> ({ request }) =&gt; {
+  <span class="c">// CREATE</span>
+  <span class="k">const</span> create = <span class="k">await</span> request.post(<span class="s">'/products'</span>, {
+    data: { name: <span class="s">'Keyboard'</span>, price: <span class="n">49.9</span> },
+  });
+  expect(create.status()).toBe(<span class="n">201</span>);
+
+  <span class="k">const</span> created = <span class="k">await</span> create.json();
+  expect(created).toMatchObject({ name: <span class="s">'Keyboard'</span>, price: <span class="n">49.9</span> });
+  expect(created.id).toBeDefined();
+
+  <span class="c">// READ BACK</span>
+  <span class="k">const</span> read = <span class="k">await</span> request.get(<span class="s">`/products/${created.id}`</span>);
+  expect(read.status()).toBe(<span class="n">200</span>);
+  expect(<span class="k">await</span> read.json()).toMatchObject({ id: created.id });
+});</pre>
+                    <div class="callout"><strong>Pattern:</strong> create → capture the <code class="inline">id</code> → use it in the next call. This chains requests like a real client.</div>
+                </div>
+                <footer class="footer">
+                    <small>POST 201 → GET 200</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 12: CRUD update + delete -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 6 · CRUD</p>
+                    <h2>Update &amp; Delete</h2>
+                </header>
+                <div class="content">
+                    <pre class="code">test(<span class="s">'PATCH updates, DELETE removes'</span>, <span class="k">async</span> ({ request }) =&gt; {
+  <span class="k">const</span> { id } = <span class="k">await</span> (<span class="k">await</span> request.post(<span class="s">'/products'</span>, {
+    data: { name: <span class="s">'Mouse'</span>, price: <span class="n">19</span> },
+  })).json();
+
+  <span class="c">// UPDATE</span>
+  <span class="k">const</span> upd = <span class="k">await</span> request.patch(<span class="s">`/products/${id}`</span>, {
+    data: { price: <span class="n">15</span> },
+  });
+  expect(upd.status()).toBe(<span class="n">200</span>);
+  expect((<span class="k">await</span> upd.json()).price).toBe(<span class="n">15</span>);
+
+  <span class="c">// DELETE</span>
+  <span class="k">const</span> del = <span class="k">await</span> request.delete(<span class="s">`/products/${id}`</span>);
+  expect(del.status()).toBe(<span class="n">200</span>);
+
+  <span class="c">// VERIFY GONE</span>
+  <span class="k">const</span> gone = <span class="k">await</span> request.get(<span class="s">`/products/${id}`</span>);
+  expect(gone.status()).toBe(<span class="n">404</span>);
+});</pre>
+                </div>
+                <footer class="footer">
+                    <small>Full lifecycle in one spec</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 13: Assertions -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 7 · Validation</p>
+                    <h2>Assertions with <code class="inline">expect</code></h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>Check</th><th>Assertion</th></tr></thead>
+                        <tbody>
+                            <tr><td>Status code</td><td><code class="inline">expect(res.status()).toBe(200)</code></td></tr>
+                            <tr><td>OK range (2xx)</td><td><code class="inline">expect(res.ok()).toBeTruthy()</code></td></tr>
+                            <tr><td>Body shape</td><td><code class="inline">expect(body).toMatchObject({…})</code></td></tr>
+                            <tr><td>Exact field</td><td><code class="inline">expect(body.price).toBe(49.9)</code></td></tr>
+                            <tr><td>Header</td><td><code class="inline">expect(res.headers()['content-type']).toContain('json')</code></td></tr>
+                            <tr><td>Built-in matcher</td><td><code class="inline">await expect(res).toBeOK()</code></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout"><strong>Schema validation:</strong> for contract testing, pipe <code class="inline">await res.json()</code> into <strong>Zod</strong> or <strong>Ajv</strong> and assert the parsed result — this catches shape drift the field-by-field checks miss.</div>
+                </div>
+                <footer class="footer">
+                    <small>status · body · headers · schema</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 14: Authentication -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 8 · Auth</p>
+                    <h2>Authentication &amp; Tokens</h2>
+                </header>
+                <div class="content">
+                    <p>Log in once in a <strong>setup project</strong>, save the token, then reuse it across tests.</p>
+                    <pre class="code"><span class="c">// auth.setup.ts — runs before the test projects</span>
+<span class="k">import</span> { test <span class="k">as</span> setup, expect } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+<span class="k">import</span> fs <span class="k">from</span> <span class="s">'node:fs'</span>;
+
+setup(<span class="s">'authenticate'</span>, <span class="k">async</span> ({ request }) =&gt; {
+  <span class="k">const</span> res = <span class="k">await</span> request.post(<span class="s">'/auth/login'</span>, {
+    data: { email: <span class="s">'admin@orderzone.net'</span>, password: <span class="s">'secret'</span> },
+  });
+  expect(res.ok()).toBeTruthy();
+  <span class="k">const</span> { access_token } = <span class="k">await</span> res.json();
+  fs.writeFileSync(<span class="s">'.auth/token.json'</span>, JSON.stringify({ access_token }));
+});</pre>
+                    <pre class="code"><span class="c">// then per-request, attach the bearer token:</span>
+<span class="k">await</span> request.get(<span class="s">'/orders'</span>, {
+  headers: { Authorization: <span class="s">`Bearer ${token}`</span> },
+});</pre>
+                </div>
+                <footer class="footer">
+                    <small>Authenticate once, reuse everywhere</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 15: Fixtures & data -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 9 · Test Data</p>
+                    <h2>Fixtures, Setup &amp; Teardown</h2>
+                </header>
+                <div class="content">
+                    <p>Use hooks and custom fixtures to seed data and clean up so tests stay independent and repeatable.</p>
+                    <pre class="code">test.describe(<span class="s">'Orders'</span>, () =&gt; {
+  <span class="k">let</span> orderId: <span class="k">number</span>;
+
+  test.beforeEach(<span class="k">async</span> ({ request }) =&gt; {
+    <span class="k">const</span> r = <span class="k">await</span> request.post(<span class="s">'/orders'</span>, { data: seedOrder });
+    orderId = (<span class="k">await</span> r.json()).id;          <span class="c">// arrange</span>
+  });
+
+  test.afterEach(<span class="k">async</span> ({ request }) =&gt; {
+    <span class="k">await</span> request.delete(<span class="s">`/orders/${orderId}`</span>);  <span class="c">// clean up</span>
+  });
+
+  test(<span class="s">'order can be fetched'</span>, <span class="k">async</span> ({ request }) =&gt; {
+    <span class="k">const</span> res = <span class="k">await</span> request.get(<span class="s">`/orders/${orderId}`</span>);
+    expect(res.ok()).toBeTruthy();
+  });
+});</pre>
+                    <div class="callout"><strong>Golden rule:</strong> a test must create everything it needs and remove it after — never depend on data left behind by another test.</div>
+                </div>
+                <footer class="footer">
+                    <small>Independent · repeatable · isolated</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 16: What is Allure -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Reporting</p>
+                    <h2>Why Allure?</h2>
+                </header>
+                <div class="content">
+                    <p>Playwright's built-in HTML report is great per-run. <strong>Allure</strong> adds a richer, business-readable layer on top.</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>What Allure adds</h3>
+                            <ul>
+                                <li><strong>History &amp; trends</strong> across runs</li>
+                                <li><strong>Severity</strong> &amp; flakiness flags</li>
+                                <li><strong>Epic / Feature / Story</strong> grouping (BDD)</li>
+                                <li><strong>Steps</strong>, attachments, screenshots, logs</li>
+                                <li>Categories for known defects</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>How it works</h3>
+                            <ul>
+                                <li>Reporter writes raw <code class="inline">allure-results/</code> JSON during the run</li>
+                                <li>The <code class="inline">allure</code> CLI compiles it into static HTML</li>
+                                <li>Language-agnostic — same report format everywhere</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="callout"><strong>Two-step model:</strong> <em>results</em> (raw data, per run) are separate from the <em>report</em> (rendered HTML). Keep results to build history.</div>
+                </div>
+                <footer class="footer">
+                    <small>Raw results → polished report</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 17: Wiring allure -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 10 · Wire It Up</p>
+                    <h2>Configuring allure-playwright</h2>
+                </header>
+                <div class="content">
+                    <p>Add the reporter (you already installed <code class="inline">allure-playwright</code>) and optionally set environment metadata:</p>
+                    <pre class="code"><span class="c">// playwright.config.ts — reporter section</span>
+reporter: [
+  [<span class="s">'allure-playwright'</span>, {
+    resultsDir: <span class="s">'allure-results'</span>,
+    detail: <span class="k">true</span>,
+    environmentInfo: {
+      API: <span class="s">'http://localhost:3000'</span>,
+      framework: <span class="s">'NestJS'</span>,
+      node: process.version,
+    },
+  }],
+],</pre>
+                    <pre class="code"><span class="c"># Install the Allure CLI to render reports (needs Java)</span>
+npm i -D allure-commandline
+<span class="c"># or: brew install allure  /  scoop install allure</span></pre>
+                </div>
+                <footer class="footer">
+                    <small>Reporter + CLI = report</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 18: Annotations -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 11 · Enrich</p>
+                    <h2>Steps, Metadata &amp; Attachments</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="k">import</span> { test, expect } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+<span class="k">import</span> { allure } <span class="k">from</span> <span class="s">'allure-playwright'</span>;
+
+test(<span class="s">'create product'</span>, <span class="k">async</span> ({ request }) =&gt; {
+  allure.epic(<span class="s">'Catalog'</span>);
+  allure.feature(<span class="s">'Products'</span>);
+  allure.severity(<span class="s">'critical'</span>);
+
+  <span class="k">const</span> res = <span class="k">await</span> test.step(<span class="s">'POST /products'</span>, <span class="k">async</span> () =&gt; {
+    <span class="k">return</span> request.post(<span class="s">'/products'</span>, { data: { name: <span class="s">'Pen'</span> } });
+  });
+
+  <span class="c">// attach the response body to the report</span>
+  <span class="k">await</span> allure.attachment(<span class="s">'response'</span>,
+    <span class="k">await</span> res.text(), <span class="s">'application/json'</span>);
+
+  expect(res.status()).toBe(<span class="n">201</span>);
+});</pre>
+                    <div class="callout"><strong><code class="inline">test.step()</code></strong> shows up as a collapsible step in Allure — group logical phases (arrange / act / assert) for readable reports.</div>
+                </div>
+                <footer class="footer">
+                    <small>epic · feature · severity · step · attachment</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 19: Generate & view -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 12 · See Results</p>
+                    <h2>Generating &amp; Viewing the Report</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># 1) Run the tests → writes raw JSON to allure-results/</span>
+npx playwright test
+
+<span class="c"># 2a) Quick: serve a temporary report (auto-opens browser)</span>
+npx allure serve allure-results
+
+<span class="c"># 2b) Persisted: build static HTML into allure-report/</span>
+npx allure generate allure-results --clean -o allure-report
+npx allure open allure-report</pre>
+                    <p>Add convenient scripts to <code class="inline">package.json</code>:</p>
+                    <pre class="code"><span class="s">"scripts"</span>: {
+  <span class="s">"test:api"</span>: <span class="s">"playwright test"</span>,
+  <span class="s">"report"</span>: <span class="s">"allure serve allure-results"</span>
+}</pre>
+                    <div class="callout"><strong>History:</strong> copy <code class="inline">allure-report/history</code> into the next <code class="inline">allure-results</code> before generating to keep trend graphs across runs.</div>
+                </div>
+                <footer class="footer">
+                    <small>serve = throwaway · generate = persisted</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 20: CI/CD -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Automation</p>
+                    <h2>Running It in CI/CD</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># .github/workflows/api-tests.yml</span>
+<span class="m">jobs</span>:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        <span class="k">with</span>: { node-version: <span class="s">'20'</span> }
+      - run: npm ci
+      - <span class="k">name</span>: Run Playwright API tests
+        run: npx playwright test          <span class="c"># webServer boots NestJS</span>
+      - <span class="k">name</span>: Build Allure report
+        <span class="k">if</span>: always()
+        run: npx allure generate allure-results --clean -o allure-report
+      - <span class="k">name</span>: Publish report
+        <span class="k">if</span>: always()
+        uses: actions/upload-artifact@v4
+        <span class="k">with</span>:
+          name: allure-report
+          path: allure-report</pre>
+                    <div class="callout"><strong><code class="inline">if: always()</code></strong> ensures the report is built and uploaded even when tests fail — that's exactly when you need it most.</div>
+                </div>
+                <footer class="footer">
+                    <small>Test → report → artifact, every push</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 21: Best practices -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Quality</p>
+                    <h2>API Testing Best Practices</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Test independence.</strong> Each spec creates &amp; cleans its own data — no shared state.</li>
+                        <li><strong>Assert status AND body.</strong> A 200 with the wrong payload is still a bug.</li>
+                        <li><strong>Cover the unhappy paths.</strong> 400 (bad input), 401/403 (auth), 404 (missing), 409 (conflict).</li>
+                        <li><strong>Validate the contract.</strong> Use schema assertions to catch shape drift early.</li>
+                        <li><strong>Centralize auth</strong> in a setup project; never hardcode tokens in specs.</li>
+                        <li><strong>Keep tests deterministic.</strong> Avoid relying on time, ordering, or live external services.</li>
+                        <li><strong>Make failures legible</strong> with steps &amp; attachments — your Allure report is the post-mortem.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>Fast, isolated, contract-aware</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 22: Lab exercises -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Hands-On</p>
+                    <h2>Lab Exercises</h2>
+                </header>
+                <div class="content">
+                    <ol>
+                        <li><strong>Scaffold</strong> a NestJS app and generate a <code class="inline">products</code> resource; run it on :3000.</li>
+                        <li><strong>Set up</strong> Playwright with <code class="inline">allure-playwright</code> and a <code class="inline">baseURL</code> + <code class="inline">webServer</code>.</li>
+                        <li><strong>Write</strong> a full CRUD spec: create → read → update → delete → verify 404.</li>
+                        <li><strong>Add negative tests:</strong> POST invalid body → 400; GET missing id → 404.</li>
+                        <li><strong>Add auth:</strong> a login setup project that saves a token, reused by a protected route.</li>
+                        <li><strong>Enrich</strong> at least one test with <code class="inline">test.step</code>, severity, and a response attachment.</li>
+                        <li><strong>Generate</strong> the Allure report and screenshot the overview &amp; a test's steps.</li>
+                        <li><strong>Bonus:</strong> wire it into GitHub Actions and upload the report as an artifact.</li>
+                    </ol>
+                </div>
+                <footer class="footer">
+                    <small>Deliverable: spec files + Allure report screenshots</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 23: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Wrap-Up</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content center">
+                    <ul>
+                        <li><strong>NestJS</strong> gives a clean, predictable REST API — the ideal system under test.</li>
+                        <li><strong>Playwright's <code class="inline">request</code></strong> fixture tests APIs fast, with no browser and the same <code class="inline">expect</code>.</li>
+                        <li>Cover <strong>full CRUD + unhappy paths</strong>, validate status, body, headers &amp; schema.</li>
+                        <li>Centralize <strong>auth</strong>; keep tests <strong>independent</strong> with setup/teardown.</li>
+                        <li><strong>Allure</strong> turns raw results into a trend-aware, business-readable report.</li>
+                        <li>Run it all in <strong>CI/CD</strong> and publish the report — even on failure.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">NestJS</span>
+                        <span class="pill">Playwright API</span>
+                        <span class="pill">Allure</span>
+                        <span class="pill warn">Test the contract</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>End of Lab 07 · API Testing with Playwright &amp; Allure</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+            <div class="page-navigation">
+                <div class="page-numbers" id="pageNumbers"></div>
+                <span class="slide-counter" id="counter">1 / 23</span>
+            </div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+            </div>
+        </nav>
+    </main>
+
+    <script>
+        const slides = [...document.querySelectorAll(".slide")];
+        const progressBars = [...document.querySelectorAll(".bar")];
+        const counter = document.getElementById("counter");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        let index = 0;
+
+        function render() {
+            slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBars.forEach((bar) => { bar.style.width = `${progress}%`; });
+            counter.textContent = `${index + 1} / ${slides.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slides.length - 1;
+            prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+            nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+            generatePageNumbers();
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= slides.length) { index = n - 1; render(); }
+        }
+
+        function generatePageNumbers() {
+            const pageNumbers = document.getElementById("pageNumbers");
+            if (!pageNumbers) return;
+            pageNumbers.innerHTML = "";
+            const total = slides.length;
+            const current = index + 1;
+            const show = [];
+            if (total > 0) show.push(1);
+            for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+                if (!show.includes(i)) show.push(i);
+            }
+            if (total > 1 && !show.includes(total)) show.push(total);
+            show.sort((a, b) => a - b);
+            show.forEach((p, i) => {
+                if (i > 0 && p - show[i - 1] > 1) {
+                    const e = document.createElement("span");
+                    e.textContent = "...";
+                    e.className = "page-ellipsis";
+                    pageNumbers.appendChild(e);
+                }
+                const b = document.createElement("button");
+                b.textContent = p;
+                b.className = "page-number" + (p === current ? " active" : "");
+                b.onclick = () => goToSlide(p);
+                pageNumbers.appendChild(b);
+            });
+        }
+
+        function nextSlide() { index = Math.min(index + 1, slides.length - 1); render(); }
+        function prevSlide() { index = Math.max(index - 1, 0); render(); }
+
+        nextBtn.addEventListener("click", nextSlide);
+        prevBtn.addEventListener("click", prevSlide);
+
+        window.addEventListener("keydown", (e) => {
+            if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); nextSlide(); }
+            if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); prevSlide(); }
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
