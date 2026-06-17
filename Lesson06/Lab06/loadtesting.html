@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 06 — Load Testing with Gatling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #f7f3eb;
+            --bg-2: #f0e7d8;
+            --ink: #1d1a14;
+            --muted: #5f5346;
+            --accent: #e36b2c;
+            --accent-2: #0e7a86;
+            --card: rgba(255, 255, 255, 0.8);
+            --shadow: 0 14px 40px rgba(31, 20, 10, 0.14);
+            --code-bg: #1e2430;
+            --code-ink: #e6edf3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Space Grotesk", sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(14, 122, 134, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(227, 107, 44, 0.2), transparent 42%),
+                linear-gradient(140deg, var(--bg-1), var(--bg-2));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .deck {
+            width: min(1100px, 94vw);
+            height: min(720px, 94vh);
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slides {
+            flex: 1;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 0.8rem;
+            opacity: 0;
+            transform: translateX(50px) scale(0.98);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide h1,
+        .slide h2 {
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: 0.03em;
+            font-family: "Bebas Neue", sans-serif;
+        }
+
+        .slide h1 {
+            font-size: clamp(2.2rem, 7vw, 5rem);
+        }
+
+        .slide h2 {
+            font-size: clamp(1.6rem, 5vw, 3rem);
+        }
+
+        .kicker {
+            text-transform: uppercase;
+            color: var(--accent-2);
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            font-size: 0.84rem;
+            margin: 0 0 0.2rem;
+        }
+
+        .content {
+            display: grid;
+            align-content: start;
+            gap: 0.7rem;
+            font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        }
+
+        .content.center {
+            align-content: center;
+        }
+
+        .content p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 80ch;
+        }
+
+        .content ul,
+        .content ol {
+            margin: 0;
+            padding-left: 1.15rem;
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .content li::marker {
+            color: var(--accent);
+        }
+
+        .content li small {
+            color: var(--muted);
+        }
+
+        /* Code blocks for Gatling Scala DSL */
+        pre.code {
+            margin: 0;
+            background: var(--code-bg);
+            color: var(--code-ink);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: clamp(0.72rem, 1.25vw, 0.92rem);
+            line-height: 1.55;
+            overflow-x: auto;
+            border: 1px solid rgba(14, 122, 134, 0.3);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            white-space: pre;
+        }
+
+        pre.code .k { color: #ff9d6e; }   /* keywords */
+        pre.code .s { color: #9ece6a; }   /* strings */
+        pre.code .m { color: #7dcfff; }   /* methods */
+        pre.code .c { color: #6b7689; font-style: italic; } /* comments */
+        pre.code .n { color: #e0af68; }   /* numbers */
+
+        code.inline {
+            font-family: "JetBrains Mono", monospace;
+            background: rgba(14, 122, 134, 0.12);
+            color: #0a4d56;
+            padding: 0.1rem 0.4rem;
+            border-radius: 5px;
+            font-size: 0.88em;
+        }
+
+        /* Tables */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.4rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(14, 122, 134, 0.15);
+            font-size: 0.92em;
+        }
+
+        .content table th,
+        .content table td {
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(14, 122, 134, 0.1);
+            vertical-align: top;
+        }
+
+        .content table th {
+            background: rgba(14, 122, 134, 0.1);
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: rgba(227, 107, 44, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0 10px 10px 0;
+            color: var(--muted);
+        }
+
+        .callout strong { color: var(--ink); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(14, 122, 134, 0.18);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+        }
+
+        .card h3 {
+            margin: 0 0 0.35rem;
+            color: var(--accent-2);
+            font-size: 1.05rem;
+        }
+
+        .pill-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            border-radius: 999px;
+            border: 1px solid rgba(14, 122, 134, 0.25);
+            background: rgba(14, 122, 134, 0.08);
+            color: #0a4d56;
+            padding: 0.32rem 0.78rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pill.warn {
+            border-color: rgba(227, 107, 44, 0.4);
+            background: rgba(227, 107, 44, 0.1);
+            color: #a8431a;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer small { color: var(--muted); }
+
+        .progress {
+            height: 6px;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 999px;
+            background: rgba(29, 26, 20, 0.1);
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), #f7a156);
+            transition: width 0.35s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem 0.9rem;
+            border-top: 1px solid rgba(93, 80, 64, 0.16);
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .page-navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-numbers {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-number {
+            border: none;
+            background: #ece6dc;
+            color: #4f4234;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-number:hover {
+            background: #ddd4c8;
+            transform: translateY(-1px);
+        }
+
+        .page-number.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .page-ellipsis {
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 0 0.2rem;
+        }
+
+        .nav-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        #prevBtn { background: #ece6dc; color: #4f4234; }
+        #nextBtn { background: var(--accent); color: #fff; }
+
+        .slide-counter { color: var(--muted); font-weight: 600; }
+
+        .nav-controls { display: flex; gap: 0.6rem; align-items: center; }
+
+        @media (max-width: 760px) {
+            .deck { height: 100vh; width: 100vw; border-radius: 0; border: none; }
+            .slide { padding: 1.1rem; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 0.5rem; padding: 0.8rem; }
+            .page-navigation { order: -1; }
+            .footer { flex-direction: column; align-items: flex-start; }
+            .progress { max-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="deck">
+        <section class="slides" id="slides">
+
+            <!-- 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Lesson 06 · Lab 06</p>
+                    <h1>Load Testing with Gatling</h1>
+                </header>
+                <div class="content center">
+                    <p>A hands-on deep dive into performance and load testing using <strong>Gatling</strong> — from the simulation anatomy and injection models to feeders, checks, assertions, reports, and CI/CD gating.</p>
+                    <div class="pill-row">
+                        <span class="pill">Scala / Java DSL</span>
+                        <span class="pill">Async &amp; Non-blocking</span>
+                        <span class="pill">Code-as-Test</span>
+                        <span class="pill">CI/CD Ready</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Performance Engineering · Automation Testing</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 2: Lab objectives -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Lab Objectives</p>
+                    <h2>What You Will Achieve</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>Explain how Gatling differs from thread-based tools and why it scales.</li>
+                        <li>Set up a Gatling project (Maven / Gradle / bundle) and run a simulation.</li>
+                        <li>Build a complete simulation: protocol, scenario, feeders, checks.</li>
+                        <li>Design realistic <strong>injection profiles</strong> (open vs. closed models).</li>
+                        <li>Add <strong>assertions</strong> that fail the build when SLAs are breached.</li>
+                        <li>Read the HTML report and integrate Gatling into a CI/CD pipeline.</li>
+                    </ul>
+                    <div class="callout">
+                        <strong>Prerequisites:</strong> JDK 17+, a build tool (Maven or Gradle), and a target app under test (e.g. the demo API from earlier labs or <code class="inline">https://computer-database.gatling.io</code>).
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Set the stage</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 3: Performance test types -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>Types of Performance Tests</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead>
+                            <tr><th>Test Type</th><th>Goal</th><th>Load Shape</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Load</strong></td><td>Behavior under expected/peak traffic</td><td>Ramp to target, hold</td></tr>
+                            <tr><td><strong>Stress</strong></td><td>Find the breaking point</td><td>Increase until failure</td></tr>
+                            <tr><td><strong>Spike</strong></td><td>React to sudden surges</td><td>Sharp jump &amp; drop</td></tr>
+                            <tr><td><strong>Soak / Endurance</strong></td><td>Detect leaks &amp; degradation</td><td>Moderate load, long duration</td></tr>
+                            <tr><td><strong>Capacity</strong></td><td>Max users at acceptable SLA</td><td>Stepwise ramp</td></tr>
+                        </tbody>
+                    </table>
+                    <p>Gatling can express <em>all</em> of these through its injection-profile DSL — this lab focuses on <strong>load</strong> with notes on the others.</p>
+                </div>
+                <footer class="footer">
+                    <small>Know your test before writing it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 4: Why Gatling -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Why Gatling</p>
+                    <h2>Gatling vs. Thread-Based Tools</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Gatling</h3>
+                            <ul>
+                                <li>Async, event-driven (Netty + Akka)</li>
+                                <li>One thread serves many virtual users</li>
+                                <li>Low memory → thousands of VUs per node</li>
+                                <li>Tests are <strong>code</strong> (Scala/Java/Kotlin) — versioned &amp; reviewable</li>
+                                <li>Beautiful HTML reports out of the box</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>JMeter (thread-per-user)</h3>
+                            <ul>
+                                <li>One OS thread per virtual user</li>
+                                <li>Memory-heavy at high concurrency</li>
+                                <li>GUI-driven XML test plans</li>
+                                <li>Huge plugin ecosystem &amp; protocols</li>
+                                <li>Easier for non-coders to start</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="callout"><strong>Takeaway:</strong> Gatling trades the GUI for code, gaining maintainability, version control, and far higher load per machine.</div>
+                </div>
+                <footer class="footer">
+                    <small>The right tool for code-centric teams</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 5: Architecture -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Under the Hood</p>
+                    <h2>How Gatling Generates Load</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Virtual Users (VUs)</strong> are lightweight messages, not OS threads.</li>
+                        <li>An <strong>event loop</strong> (Netty) handles non-blocking I/O — a request that is "waiting" consumes almost no resources.</li>
+                        <li>Each VU walks through a <strong>scenario</strong> (a sequence of actions) independently.</li>
+                        <li>An <strong>injection profile</strong> decides <em>when and how fast</em> VUs enter the system.</li>
+                        <li>Results stream to a <code class="inline">simulation.log</code>, later compiled into an HTML report.</li>
+                    </ul>
+                    <div class="callout">
+                        <strong>Mental model:</strong> <em>Scenario</em> = the journey one user takes · <em>Injection</em> = how many users start that journey and when · <em>Protocol</em> = the shared connection config.
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Async = scale</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 6: Setup -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 0 · Setup</p>
+                    <h2>Create a Gatling Project</h2>
+                </header>
+                <div class="content">
+                    <p>Use the official Maven archetype (Scala DSL) — the most common starting point:</p>
+                    <pre class="code"><span class="c"># Generate a Gatling + Maven project</span>
+mvn archetype:generate \
+  -DarchetypeGroupId=io.gatling.highcharts \
+  -DarchetypeArtifactId=gatling-highcharts-maven-archetype \
+  -DarchetypeVersion=<span class="n">3.11.5</span>
+
+<span class="c"># Project layout</span>
+src/test/scala/        <span class="c"># your simulations live here</span>
+src/test/resources/    <span class="c"># feeders (CSV/JSON), config</span>
+pom.xml</pre>
+                    <div class="pill-row">
+                        <span class="pill">Maven</span>
+                        <span class="pill">Gradle plugin</span>
+                        <span class="pill">sbt</span>
+                        <span class="pill">Standalone bundle</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>One command to scaffold</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 7: Anatomy -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 1 · Structure</p>
+                    <h2>Anatomy of a Simulation</h2>
+                </header>
+                <div class="content">
+                    <p>Every Gatling test is a class extending <code class="inline">Simulation</code> with three building blocks:</p>
+                    <pre class="code"><span class="k">import</span> io.gatling.core.Predef._
+<span class="k">import</span> io.gatling.http.Predef._
+<span class="k">import</span> scala.concurrent.duration._
+
+<span class="k">class</span> BasicSimulation <span class="k">extends</span> Simulation {
+
+  <span class="c">// 1) PROTOCOL — shared HTTP config</span>
+  <span class="k">val</span> httpProtocol = http
+    .baseUrl(<span class="s">"https://computer-database.gatling.io"</span>)
+    .acceptHeader(<span class="s">"application/json"</span>)
+
+  <span class="c">// 2) SCENARIO — the user journey</span>
+  <span class="k">val</span> scn = scenario(<span class="s">"Browse computers"</span>)
+    .exec(http(<span class="s">"List"</span>).get(<span class="s">"/computers"</span>))
+
+  <span class="c">// 3) SETUP — injection + protocol binding</span>
+  setUp(
+    scn.inject(atOnceUsers(<span class="n">1</span>))
+  ).protocols(httpProtocol)
+}</pre>
+                </div>
+                <footer class="footer">
+                    <small>Protocol · Scenario · setUp</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 8: Protocol detail -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 2 · Protocol</p>
+                    <h2>Configuring the HTTP Protocol</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="k">val</span> httpProtocol = http
+  .baseUrl(<span class="s">"https://api.example.com"</span>)
+  .acceptHeader(<span class="s">"application/json"</span>)
+  .contentTypeHeader(<span class="s">"application/json"</span>)
+  .userAgentHeader(<span class="s">"Gatling/LoadTest"</span>)
+  .authorizationHeader(<span class="s">"Bearer #{token}"</span>)  <span class="c">// from session</span>
+  .shareConnections                          <span class="c">// reuse TCP conns</span>
+  .check(status.not(<span class="n">500</span>))                   <span class="c">// global check</span></pre>
+                    <p>The protocol is defined once and reused by every scenario, keeping headers, base URL, connection strategy, and global checks consistent.</p>
+                </div>
+                <footer class="footer">
+                    <small>Define connection rules once</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 9: Scenario detail -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 3 · Scenario</p>
+                    <h2>Modeling the User Journey</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="k">val</span> scn = scenario(<span class="s">"Search and view"</span>)
+  .exec(
+    http(<span class="s">"Home"</span>).get(<span class="s">"/"</span>)
+      .check(status.is(<span class="n">200</span>))
+  )
+  .pause(<span class="n">2</span>)                              <span class="c">// think time</span>
+  .exec(
+    http(<span class="s">"Search"</span>).get(<span class="s">"/computers?f=macbook"</span>)
+      .check(jsonPath(<span class="s">"$[0].id"</span>).saveAs(<span class="s">"compId"</span>))
+  )
+  .pause(<span class="n">1</span>, <span class="n">3</span>)                          <span class="c">// random 1–3s</span>
+  .exec(
+    http(<span class="s">"View detail"</span>)
+      .get(<span class="s">"/computers/#{compId}"</span>)   <span class="c">// reuse saved value</span>
+  )</pre>
+                    <div class="callout"><strong>Think time</strong> (<code class="inline">pause</code>) simulates real users pausing between actions — essential for realistic load.</div>
+                </div>
+                <footer class="footer">
+                    <small>Chain actions like a real user</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 10: Feeders -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 4 · Data</p>
+                    <h2>Feeders — Data-Driven Tests</h2>
+                </header>
+                <div class="content">
+                    <p>Feeders inject unique data per virtual user so they don't all send identical requests.</p>
+                    <pre class="code"><span class="c">// users.csv → columns: username,password</span>
+<span class="k">val</span> credentials = csv(<span class="s">"users.csv"</span>).circular
+
+<span class="k">val</span> scn = scenario(<span class="s">"Login"</span>)
+  .feed(credentials)                  <span class="c">// pull one row per VU</span>
+  .exec(
+    http(<span class="s">"Login"</span>).post(<span class="s">"/login"</span>)
+      .formParam(<span class="s">"user"</span>, <span class="s">"#{username}"</span>)
+      .formParam(<span class="s">"pass"</span>, <span class="s">"#{password}"</span>)
+      .check(status.is(<span class="n">200</span>))
+  )</pre>
+                    <table>
+                        <thead><tr><th>Strategy</th><th>Behavior</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="inline">.queue</code></td><td>Each row used once, then crashes (default)</td></tr>
+                            <tr><td><code class="inline">.circular</code></td><td>Loops back to the start</td></tr>
+                            <tr><td><code class="inline">.random</code></td><td>Picks a random row each time</td></tr>
+                            <tr><td><code class="inline">.shuffle</code></td><td>Shuffled, each used once</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>CSV · JSON · JDBC · custom</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 11: Checks -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 5 · Validation</p>
+                    <h2>Checks — Validate &amp; Extract</h2>
+                </header>
+                <div class="content">
+                    <p>Checks verify responses and capture values into the session for later steps.</p>
+                    <pre class="code">.exec(
+  http(<span class="s">"Get order"</span>).get(<span class="s">"/orders/42"</span>)
+    .check(status.is(<span class="n">200</span>))
+    .check(responseTimeInMillis.lt(<span class="n">800</span>))
+    .check(jsonPath(<span class="s">"$.status"</span>).is(<span class="s">"PAID"</span>))
+    .check(jsonPath(<span class="s">"$.total"</span>).saveAs(<span class="s">"amount"</span>))
+    .check(header(<span class="s">"Content-Type"</span>).is(<span class="s">"application/json"</span>))
+    .check(bodyString.exists)
+)</pre>
+                    <div class="callout"><strong>Failed check = failed request</strong> in the report. Checks are how Gatling distinguishes a slow-but-correct response from an actual error.</div>
+                </div>
+                <footer class="footer">
+                    <small>status · jsonPath · regex · responseTime</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 12: Injection profiles -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 6 · Load Shape</p>
+                    <h2>Injection Profiles</h2>
+                </header>
+                <div class="content">
+                    <p>The injection profile is the heart of load testing — it defines the traffic shape.</p>
+                    <pre class="code">setUp(
+  scn.inject(
+    nothingFor(<span class="n">5</span>.seconds),              <span class="c">// warm-up gap</span>
+    atOnceUsers(<span class="n">10</span>),                   <span class="c">// 10 users instantly</span>
+    rampUsers(<span class="n">100</span>).during(<span class="n">30</span>.seconds), <span class="c">// ramp to 100</span>
+    constantUsersPerSec(<span class="n">20</span>).during(<span class="n">2</span>.minutes), <span class="c">// hold</span>
+    rampUsersPerSec(<span class="n">10</span>).to(<span class="n">50</span>).during(<span class="n">1</span>.minute) <span class="c">// climb</span>
+  )
+).protocols(httpProtocol)</pre>
+                    <div class="pill-row">
+                        <span class="pill">atOnceUsers</span>
+                        <span class="pill">rampUsers</span>
+                        <span class="pill">constantUsersPerSec</span>
+                        <span class="pill">rampUsersPerSec</span>
+                        <span class="pill">heavisideUsers</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Compose steps to shape traffic</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 13: Open vs Closed -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Modeling</p>
+                    <h2>Open vs. Closed Models</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Open Model</h3>
+                            <p>You control the <strong>arrival rate</strong> of new users. Concurrency grows if the system slows down — like the open internet.</p>
+                            <pre class="code">scn.inject(
+  constantUsersPerSec(<span class="n">50</span>)
+    .during(<span class="n">5</span>.minutes)
+)</pre>
+                        </div>
+                        <div class="card">
+                            <h3>Closed Model</h3>
+                            <p>You control the <strong>number of concurrent users</strong>. A new user starts only when another finishes — like a call center with N agents.</p>
+                            <pre class="code">scn.inject(
+  constantConcurrentUsers(<span class="n">100</span>)
+    .during(<span class="n">5</span>.minutes)
+)</pre>
+                        </div>
+                    </div>
+                    <div class="callout"><strong>Rule of thumb:</strong> Public web/API traffic → open model. Systems with fixed connection pools or session limits → closed model.</div>
+                </div>
+                <footer class="footer">
+                    <small>Match the model to reality</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 14: Assertions -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 7 · SLA Gates</p>
+                    <h2>Assertions — Pass/Fail Criteria</h2>
+                </header>
+                <div class="content">
+                    <p>Assertions evaluate <em>global</em> results and set the exit code — this is what makes a build fail in CI.</p>
+                    <pre class="code">setUp(scn.inject(rampUsers(<span class="n">200</span>).during(<span class="n">60</span>)))
+  .protocols(httpProtocol)
+  .assertions(
+    global.responseTime.max.lt(<span class="n">2000</span>),        <span class="c">// max &lt; 2s</span>
+    global.responseTime.percentile3.lt(<span class="n">800</span>),  <span class="c">// p95 &lt; 800ms</span>
+    global.successfulRequests.percent.gt(<span class="n">99</span>), <span class="c">// &gt;99% OK</span>
+    forAll.failedRequests.count.lt(<span class="n">10</span>),
+    details(<span class="s">"Login"</span>).responseTime.mean.lt(<span class="n">500</span>)
+  )</pre>
+                    <div class="callout"><strong>Exit code 0</strong> = all assertions passed. Any failure returns non-zero, breaking the pipeline.</div>
+                </div>
+                <footer class="footer">
+                    <small>global · forAll · details(name)</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 15: Running -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 8 · Execute</p>
+                    <h2>Running a Simulation</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># Maven — interactive picker</span>
+mvn gatling:test
+
+<span class="c"># Maven — run a specific simulation, non-interactive</span>
+mvn gatling:test -Dgatling.simulationClass=simulations.BasicSimulation
+
+<span class="c"># Gradle</span>
+./gradlew gatlingRun
+
+<span class="c"># Standalone bundle</span>
+./bin/gatling.sh -s simulations.BasicSimulation</pre>
+                    <p>Pass runtime parameters via system properties and read them in the simulation:</p>
+                    <pre class="code"><span class="k">val</span> users = System.getProperty(<span class="s">"users"</span>, <span class="s">"50"</span>).toInt
+<span class="k">val</span> rampSec = System.getProperty(<span class="s">"ramp"</span>, <span class="s">"30"</span>).toInt
+<span class="c">// mvn gatling:test -Dusers=500 -Dramp=120</span></pre>
+                </div>
+                <footer class="footer">
+                    <small>Parameterize for reuse across environments</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 16: Reading the report -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Step 9 · Analyze</p>
+                    <h2>Reading the HTML Report</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>Metric</th><th>What it tells you</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Response time percentiles</strong></td><td>p50/p75/p95/p99 — focus on <strong>p95/p99</strong>, not the mean. Tail latency is what users feel.</td></tr>
+                            <tr><td><strong>Requests/sec (throughput)</strong></td><td>Actual load delivered vs. intended</td></tr>
+                            <tr><td><strong>Active users over time</strong></td><td>Confirms your injection profile ran as designed</td></tr>
+                            <tr><td><strong>Errors / KO count</strong></td><td>Failed requests &amp; failed checks, grouped by cause</td></tr>
+                            <tr><td><strong>Response-time distribution</strong></td><td>Spots bimodal behavior (cache hit vs. miss)</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout"><strong>Beware the average.</strong> A mean of 200ms can hide a p99 of 5s. Always read percentiles and the distribution chart.</div>
+                </div>
+                <footer class="footer">
+                    <small>Generated at target/gatling/.../index.html</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 17: Full example -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Putting It Together</p>
+                    <h2>Complete Load Test</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="k">class</span> ShopLoadSimulation <span class="k">extends</span> Simulation {
+  <span class="k">val</span> httpProtocol = http
+    .baseUrl(<span class="s">"https://shop.example.com"</span>)
+    .acceptHeader(<span class="s">"application/json"</span>)
+
+  <span class="k">val</span> products = csv(<span class="s">"products.csv"</span>).random
+
+  <span class="k">val</span> scn = scenario(<span class="s">"Browse &amp; buy"</span>)
+    .feed(products)
+    .exec(http(<span class="s">"Catalog"</span>).get(<span class="s">"/products"</span>)
+      .check(status.is(<span class="n">200</span>)))
+    .pause(<span class="n">1</span>, <span class="n">3</span>)
+    .exec(http(<span class="s">"Detail"</span>).get(<span class="s">"/products/#{sku}"</span>))
+    .pause(<span class="n">2</span>)
+    .exec(http(<span class="s">"Add to cart"</span>).post(<span class="s">"/cart"</span>)
+      .body(StringBody(<span class="s">"""{"sku":"#{sku}","qty":1}"""</span>))
+      .check(status.is(<span class="n">201</span>)))
+
+  setUp(
+    scn.inject(
+      rampUsers(<span class="n">50</span>).during(<span class="n">30</span>.seconds),
+      constantUsersPerSec(<span class="n">20</span>).during(<span class="n">3</span>.minutes)
+    )
+  ).protocols(httpProtocol)
+   .assertions(
+     global.responseTime.percentile3.lt(<span class="n">1000</span>),
+     global.successfulRequests.percent.gt(<span class="n">99</span>)
+   )
+}</pre>
+                </div>
+                <footer class="footer">
+                    <small>Protocol → feeder → scenario → inject → assert</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 18: Best practices -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Quality</p>
+                    <h2>Load-Testing Best Practices</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Test a prod-like environment.</strong> Results from a laptop or shared staging are meaningless.</li>
+                        <li><strong>Always include think time.</strong> Zero-pause tests create unrealistic, hammering load.</li>
+                        <li><strong>Use unique data per VU</strong> via feeders to avoid server-side caching skew.</li>
+                        <li><strong>Read percentiles, not averages.</strong> p95/p99 reflect real user pain.</li>
+                        <li><strong>Separate load generator from target.</strong> Don't let the injector become the bottleneck.</li>
+                        <li><strong>Watch the server too.</strong> Correlate Gatling results with CPU, memory, GC, DB metrics.</li>
+                        <li><strong>Start small, ramp gradually,</strong> and baseline before optimizing.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>Realism beats raw numbers</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 19: CI/CD -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Automation</p>
+                    <h2>Gatling in CI/CD</h2>
+                </header>
+                <div class="content">
+                    <p>Because assertions set the exit code, Gatling drops straight into any pipeline as a quality gate.</p>
+                    <pre class="code"><span class="c"># .github/workflows/load-test.yml</span>
+<span class="m">jobs</span>:
+  load-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        <span class="k">with</span>:
+          java-version: <span class="s">'17'</span>
+          distribution: <span class="s">'temurin'</span>
+      - <span class="k">name</span>: Run Gatling load test
+        run: mvn gatling:test -Dusers=200 -Dramp=60
+      - <span class="k">name</span>: Publish report
+        <span class="k">if</span>: always()
+        uses: actions/upload-artifact@v4
+        <span class="k">with</span>:
+          name: gatling-report
+          path: target/gatling/**</pre>
+                    <div class="callout"><strong>Tip:</strong> Run load tests on a schedule (nightly) rather than every commit — they are slower and need a stable environment.</div>
+                </div>
+                <footer class="footer">
+                    <small>Fail fast on performance regressions</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 20: Lab exercises -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Hands-On</p>
+                    <h2>Lab Exercises</h2>
+                </header>
+                <div class="content">
+                    <ol>
+                        <li><strong>Scaffold</strong> a Gatling Maven project and run the generated sample.</li>
+                        <li><strong>Write</strong> a 3-step scenario against <code class="inline">computer-database.gatling.io</code> (list → search → detail) with checks.</li>
+                        <li><strong>Add a CSV feeder</strong> so each VU searches a different term.</li>
+                        <li><strong>Design</strong> a load profile: ramp to 100 users over 30s, hold 2 min.</li>
+                        <li><strong>Add assertions:</strong> p95 &lt; 800ms and success rate &gt; 99%.</li>
+                        <li><strong>Run, then break it:</strong> raise the load until an assertion fails. Record the failing point.</li>
+                        <li><strong>Bonus:</strong> wire it into a GitHub Actions workflow that uploads the report.</li>
+                    </ol>
+                </div>
+                <footer class="footer">
+                    <small>Deliverable: simulation class + report screenshot</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 21: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Wrap-Up</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content center">
+                    <ul>
+                        <li>Gatling is <strong>load testing as code</strong> — async, scalable, version-controlled.</li>
+                        <li>Every test = <strong>Protocol + Scenario + Injection</strong>, validated by <strong>Checks</strong>.</li>
+                        <li><strong>Feeders</strong> give realistic, unique data; <strong>pauses</strong> give realistic timing.</li>
+                        <li><strong>Injection profiles</strong> (open vs. closed) shape the load to match reality.</li>
+                        <li><strong>Assertions</strong> turn results into pass/fail CI gates.</li>
+                        <li>Read <strong>percentiles</strong>, correlate with server metrics, and test prod-like.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Code-as-Test</span>
+                        <span class="pill">Scalable</span>
+                        <span class="pill">CI/CD Gate</span>
+                        <span class="pill warn">Read p95/p99</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>End of Lab 06 · Load Testing with Gatling</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+            <div class="page-navigation">
+                <div class="page-numbers" id="pageNumbers"></div>
+                <span class="slide-counter" id="counter">1 / 21</span>
+            </div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+            </div>
+        </nav>
+    </main>
+
+    <script>
+        const slides = [...document.querySelectorAll(".slide")];
+        const progressBars = [...document.querySelectorAll(".bar")];
+        const counter = document.getElementById("counter");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        let index = 0;
+
+        function render() {
+            slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBars.forEach((bar) => { bar.style.width = `${progress}%`; });
+            counter.textContent = `${index + 1} / ${slides.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slides.length - 1;
+            prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+            nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+            generatePageNumbers();
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= slides.length) { index = n - 1; render(); }
+        }
+
+        function generatePageNumbers() {
+            const pageNumbers = document.getElementById("pageNumbers");
+            if (!pageNumbers) return;
+            pageNumbers.innerHTML = "";
+            const total = slides.length;
+            const current = index + 1;
+            const show = [];
+            if (total > 0) show.push(1);
+            for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+                if (!show.includes(i)) show.push(i);
+            }
+            if (total > 1 && !show.includes(total)) show.push(total);
+            show.sort((a, b) => a - b);
+            show.forEach((p, i) => {
+                if (i > 0 && p - show[i - 1] > 1) {
+                    const e = document.createElement("span");
+                    e.textContent = "...";
+                    e.className = "page-ellipsis";
+                    pageNumbers.appendChild(e);
+                }
+                const b = document.createElement("button");
+                b.textContent = p;
+                b.className = "page-number" + (p === current ? " active" : "");
+                b.onclick = () => goToSlide(p);
+                pageNumbers.appendChild(b);
+            });
+        }
+
+        function nextSlide() { index = Math.min(index + 1, slides.length - 1); render(); }
+        function prevSlide() { index = Math.max(index - 1, 0); render(); }
+
+        nextBtn.addEventListener("click", nextSlide);
+        prevBtn.addEventListener("click", prevSlide);
+
+        window.addEventListener("keydown", (e) => {
+            if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); nextSlide(); }
+            if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); prevSlide(); }
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
