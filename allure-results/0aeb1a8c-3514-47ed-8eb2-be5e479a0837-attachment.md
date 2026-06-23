@@ -1,0 +1,73 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: products.spec.ts >> POST creates a product, GET reads it back
+- Location: Lesson07\tests\tests\products.spec.ts:13:5
+
+# Error details
+
+```
+Error: expect(received).toBeDefined()
+
+Received: undefined
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | 
+  3  | test('GET /products returns a list', async ({ request }) => {
+  4  |   const res = await request.get('/products');
+  5  | 
+  6  |   expect(res.status()).toBe(200);
+  7  |   expect(res.ok()).toBeTruthy();
+  8  |     console.log(await res.text());
+  9  |   const body = await res.json();
+  10 |   expect(Array.isArray(body)).toBe(true);
+  11 | });
+  12 | 
+  13 | test('POST creates a product, GET reads it back', async ({ request }) => {
+  14 |   // CREATE
+  15 |   const create = await request.post('/products', {
+  16 |     data: { name: 'Keyboard', price: 49.9 },
+  17 |   });
+  18 |   expect(create.status()).toBe(201);
+  19 | 
+  20 |   const created = await create.json();
+  21 |   expect(created).toMatchObject({ name: 'Keyboard', price: 49.9 });
+> 22 |   expect(created.id).toBeDefined();
+     |                      ^ Error: expect(received).toBeDefined()
+  23 | 
+  24 |   // READ BACK
+  25 |   const read = await request.get(`/products/${created.id}`);
+  26 |   expect(read.status()).toBe(200);
+  27 |   expect(await read.json()).toMatchObject({ id: created.id });
+  28 | });
+  29 | 
+  30 | test('PATCH updates, DELETE removes', async ({ request }) => {
+  31 |   const { id } = await (await request.post('/products', {
+  32 |     data: { name: 'Mouse', price: 19 },
+  33 |   })).json();
+  34 | 
+  35 |   // UPDATE
+  36 |   const upd = await request.patch(`/products/${id}`, {
+  37 |     data: { price: 15 },
+  38 |   });
+  39 |   expect(upd.status()).toBe(200);
+  40 |   expect((await upd.json()).price).toBe(15);
+  41 | 
+  42 |   // DELETE
+  43 |   const del = await request.delete(`/products/${id}`);
+  44 |   expect(del.status()).toBe(200);
+  45 | 
+  46 |   // VERIFY GONE
+  47 |   const gone = await request.get(`/products/${id}`);
+  48 |   expect(gone.status()).toBe(404);
+  49 | });
+```
