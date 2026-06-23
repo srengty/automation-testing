@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 08 — Private Cloud Storage App · Spring Boot · JUnit · Playwright · Allure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #f7f3eb;
+            --bg-2: #f0e7d8;
+            --ink: #1d1a14;
+            --muted: #5f5346;
+            --accent: #e36b2c;
+            --accent-2: #0e7a86;
+            --card: rgba(255, 255, 255, 0.8);
+            --shadow: 0 14px 40px rgba(31, 20, 10, 0.14);
+            --code-bg: #1e2430;
+            --code-ink: #e6edf3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Space Grotesk", sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(14, 122, 134, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(227, 107, 44, 0.2), transparent 42%),
+                linear-gradient(140deg, var(--bg-1), var(--bg-2));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .deck {
+            width: min(1100px, 94vw);
+            height: min(720px, 94vh);
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slides {
+            flex: 1;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 0.8rem;
+            opacity: 0;
+            transform: translateX(50px) scale(0.98);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide h1,
+        .slide h2 {
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: 0.03em;
+            font-family: "Bebas Neue", sans-serif;
+        }
+
+        .slide h1 {
+            font-size: clamp(2.2rem, 7vw, 5rem);
+        }
+
+        .slide h2 {
+            font-size: clamp(1.6rem, 5vw, 3rem);
+        }
+
+        .kicker {
+            text-transform: uppercase;
+            color: var(--accent-2);
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            font-size: 0.84rem;
+            margin: 0 0 0.2rem;
+        }
+
+        .content {
+            display: grid;
+            align-content: start;
+            gap: 0.7rem;
+            font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        }
+
+        .content.center {
+            align-content: center;
+        }
+
+        .content p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 80ch;
+        }
+
+        .content ul,
+        .content ol {
+            margin: 0;
+            padding-left: 1.15rem;
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .content li::marker {
+            color: var(--accent);
+        }
+
+        .content li small {
+            color: var(--muted);
+        }
+
+        pre.code {
+            margin: 0;
+            background: var(--code-bg);
+            color: var(--code-ink);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: clamp(0.72rem, 1.25vw, 0.92rem);
+            line-height: 1.55;
+            overflow-x: auto;
+            border: 1px solid rgba(14, 122, 134, 0.3);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            white-space: pre;
+        }
+
+        pre.code .k { color: #ff9d6e; }
+        pre.code .s { color: #9ece6a; }
+        pre.code .m { color: #7dcfff; }
+        pre.code .c { color: #6b7689; font-style: italic; }
+        pre.code .n { color: #e0af68; }
+
+        code.inline {
+            font-family: "JetBrains Mono", monospace;
+            background: rgba(14, 122, 134, 0.12);
+            color: #0a4d56;
+            padding: 0.1rem 0.4rem;
+            border-radius: 5px;
+            font-size: 0.88em;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.4rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(14, 122, 134, 0.15);
+            font-size: 0.92em;
+        }
+
+        .content table th,
+        .content table td {
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(14, 122, 134, 0.1);
+            vertical-align: top;
+        }
+
+        .content table th {
+            background: rgba(14, 122, 134, 0.1);
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: rgba(227, 107, 44, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0 10px 10px 0;
+            color: var(--muted);
+        }
+
+        .callout strong { color: var(--ink); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(14, 122, 134, 0.18);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+        }
+
+        .card h3 {
+            margin: 0 0 0.35rem;
+            color: var(--accent-2);
+            font-size: 1.05rem;
+        }
+
+        .pill-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            border-radius: 999px;
+            border: 1px solid rgba(14, 122, 134, 0.25);
+            background: rgba(14, 122, 134, 0.08);
+            color: #0a4d56;
+            padding: 0.32rem 0.78rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pill.warn {
+            border-color: rgba(227, 107, 44, 0.4);
+            background: rgba(227, 107, 44, 0.1);
+            color: #a8431a;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer small { color: var(--muted); }
+
+        .progress {
+            height: 6px;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 999px;
+            background: rgba(29, 26, 20, 0.1);
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), #f7a156);
+            transition: width 0.35s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem 0.9rem;
+            border-top: 1px solid rgba(93, 80, 64, 0.16);
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .page-navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-numbers {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-number {
+            border: none;
+            background: #ece6dc;
+            color: #4f4234;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-number:hover {
+            background: #ddd4c8;
+            transform: translateY(-1px);
+        }
+
+        .page-number.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .page-ellipsis {
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 0 0.2rem;
+        }
+
+        .nav-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        #prevBtn { background: #ece6dc; color: #4f4234; }
+        #nextBtn { background: var(--accent); color: #fff; }
+
+        .slide-counter { color: var(--muted); font-weight: 600; }
+
+        .nav-controls { display: flex; gap: 0.6rem; align-items: center; }
+
+        @media (max-width: 760px) {
+            .deck { height: 100vh; width: 100vw; border-radius: 0; border: none; }
+            .slide { padding: 1.1rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 0.5rem; padding: 0.8rem; }
+            .page-navigation { order: -1; }
+            .footer { flex-direction: column; align-items: flex-start; }
+            .progress { max-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="deck">
+        <section class="slides" id="slides">
+
+            <!-- 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Lesson 08 · Lab 08</p>
+                    <h1>Private Cloud Storage App</h1>
+                </header>
+                <div class="content center">
+                    <p>Build a <strong>Private Cloud Storage</strong> backend with <strong>Spring Boot</strong> where each user manages their own files &amp; folders, then prove it works with a full test suite that uses <strong>every testing method</strong> from this lesson — driven by <strong>JUnit&nbsp;5</strong> &amp; <strong>Playwright</strong> and reported with <strong>Allure</strong>.</p>
+                    <div class="pill-row">
+                        <span class="pill">Spring Boot</span>
+                        <span class="pill">JUnit 5</span>
+                        <span class="pill">Playwright (Java)</span>
+                        <span class="pill">Allure Report</span>
+                        <span class="pill warn">Submit via GitHub + Moodle</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Hands-on Lab · Automation Testing</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 2: The brief -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">The Brief</p>
+                    <h2>What You Are Building</h2>
+                </header>
+                <div class="content">
+                    <p>A REST API (optionally with a thin web UI) for a personal cloud drive. Each registered user gets an isolated storage space and can only ever see their own data.</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Files &amp; Folders</h3>
+                            <p>Create, rename, move, list, download and delete files and folders inside the user's <strong>own</strong> storage.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Accounts</h3>
+                            <p>Register a new user (granted <strong>50&nbsp;MB</strong>), view &amp; edit profile, and <strong>delete their own account</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="callout"><strong>Hard rule:</strong> a user must never read, write, or delete another user's files. Enforcing — and testing — this isolation is part of the grade.</div>
+                </div>
+                <footer class="footer">
+                    <small>Your own private drive</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 3: Functional requirements -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Requirements</p>
+                    <h2>Functional Requirements</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>#</th><th>Capability</th><th>Detail</th></tr></thead>
+                        <tbody>
+                            <tr><td>R1</td><td>Register</td><td>New user created with a <strong>50&nbsp;MB</strong> quota</td></tr>
+                            <tr><td>R2</td><td>Authenticate</td><td>Login; each request acts as the logged-in user</td></tr>
+                            <tr><td>R3</td><td>Manage profile</td><td>View &amp; update display name / password</td></tr>
+                            <tr><td>R4</td><td>Delete account</td><td>User deletes <strong>own</strong> account + all their data</td></tr>
+                            <tr><td>R5</td><td>Folders</td><td>Create, rename, move, list, delete folders</td></tr>
+                            <tr><td>R6</td><td>Files</td><td>Upload, download, rename, move, delete files</td></tr>
+                            <tr><td>R7</td><td>Quota</td><td>Reject uploads that exceed remaining space</td></tr>
+                            <tr><td>R8</td><td>Isolation</td><td>No access to another user's files/folders</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>R1–R8 must all be testable</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 4: Suggested architecture -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Design</p>
+                    <h2>Suggested Architecture</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c">// Spring Boot layering</span>
+controller/   <span class="c">// REST endpoints (@RestController)</span>
+service/      <span class="c">// business logic: quota, isolation, formulas</span>
+repository/   <span class="c">// Spring Data JPA (User, FileEntity, Folder)</span>
+model/        <span class="c">// entities + DTOs</span>
+config/       <span class="c">// Spring Security (per-user auth)</span>
+
+<span class="c">// Core entities</span>
+User   { id, email, displayName, passwordHash, quotaBytes=52428800, usedBytes }
+Folder { id, ownerId, name, parentId }
+File   { id, ownerId, folderId, name, sizeBytes, createdAt }</pre>
+                    <div class="callout"><strong>Storage:</strong> H2 (in-memory) is fine for the DB; store file bytes on disk or in a BLOB. Keep <code class="inline">usedBytes</code> in sync so the quota <em>formula</em> is testable.</div>
+                </div>
+                <footer class="footer">
+                    <small>Controller · Service · Repository</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 5: Suggested endpoints -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">API Surface</p>
+                    <h2>Suggested Endpoints</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># Accounts</span>
+POST   /api/auth/register      <span class="c"># {email,password} → user (50MB)</span>
+POST   /api/auth/login         <span class="c"># → token / session</span>
+GET    /api/me                 <span class="c"># profile + quota usage</span>
+PUT    /api/me                 <span class="c"># update display name / password</span>
+DELETE /api/me                 <span class="c"># delete own account + data</span>
+
+<span class="c"># Folders</span>
+POST   /api/folders            GET /api/folders?parent=ID
+PATCH  /api/folders/{id}       DELETE /api/folders/{id}
+
+<span class="c"># Files</span>
+POST   /api/files  (multipart) GET /api/files/{id}/download
+GET    /api/files?folder=ID    PATCH /api/files/{id}
+DELETE /api/files/{id}</pre>
+                    <div class="callout">You may add a small Thymeleaf/HTML UI so Playwright can drive the browser — but the API alone is enough to demonstrate every testing method.</div>
+                </div>
+                <footer class="footer">
+                    <small>Design the contract first</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 6: Testing requirement -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">The Core Task</p>
+                    <h2>Use Every Testing Method</h2>
+                </header>
+                <div class="content">
+                    <p>Your test suite <strong>must demonstrate all ten methods</strong> from the lecture. Map each one to a real scenario in your app:</p>
+                    <table>
+                        <thead><tr><th>Method</th><th>Where to use it</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Content equals</strong></td><td>New user quota == 50&nbsp;MB; file id round-trips</td></tr>
+                            <tr><td><strong>Contains</strong></td><td>Folder listing contains an uploaded file name</td></tr>
+                            <tr><td><strong>Regex matched</strong></td><td>Email format; generated share/download link</td></tr>
+                            <tr><td><strong>Formula matched</strong></td><td>free = quota − Σ(file sizes)</td></tr>
+                            <tr><td><strong>Predicate</strong></td><td>usedBytes never exceeds quotaBytes</td></tr>
+                            <tr><td><strong>Collection</strong></td><td>List ordering, size, no duplicates</td></tr>
+                            <tr><td><strong>Exception</strong></td><td>Over-quota upload throws / returns 4xx</td></tr>
+                            <tr><td><strong>Tolerance</strong></td><td>Used MB ≈ value within delta; response &lt; budget</td></tr>
+                            <tr><td><strong>Schema/JSON</strong></td><td>/api/me response shape &amp; fields</td></tr>
+                            <tr><td><strong>Visual/snapshot</strong></td><td>Playwright web assertion / screenshot</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>One test per method, minimum</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 7: Example test 1 -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Example · Service Test</p>
+                    <h2>Equals · Formula · Exception</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="m">@SpringBootTest</span>
+<span class="m">@Epic</span>(<span class="s">"Storage"</span>) <span class="m">@Feature</span>(<span class="s">"Quota"</span>)
+<span class="k">class</span> QuotaTest {
+  <span class="k">static final long</span> MB = <span class="n">1_048_576L</span>;
+  <span class="m">@Autowired</span> StorageService storage;
+  <span class="m">@Autowired</span> UserService users;
+
+  <span class="m">@Test</span>
+  <span class="k">void</span> newUserGets50MbAndFormulaHolds() {
+    User u = users.register(<span class="s">"sok@itc.edu"</span>, <span class="s">"Secret123!"</span>);
+    assertThat(u.getQuotaBytes()).isEqualTo(<span class="n">50</span> * MB);   <span class="c">// equals</span>
+
+    storage.upload(u, file(<span class="n">10</span> * MB));
+    storage.upload(u, file(<span class="n">15</span> * MB));
+    <span class="k">long</span> free = u.getQuotaBytes() - <span class="n">25</span> * MB;          <span class="c">// formula</span>
+    assertThat(storage.freeBytes(u)).isEqualTo(free);
+
+    assertThrows(QuotaExceededException.class,           <span class="c">// exception</span>
+        () -&gt; storage.upload(u, file(<span class="n">40</span> * MB)));
+  }
+}</pre>
+                </div>
+                <footer class="footer">
+                    <small>Three methods, one test class</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 8: Example test 2 -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Example · Playwright API</p>
+                    <h2>Regex · Schema · Contains</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="m">@Test</span> <span class="m">@Feature</span>(<span class="s">"Profile"</span>)
+<span class="k">void</span> profileEndpointContract() {
+  APIResponse res = request.get(<span class="s">"/api/me"</span>);
+  assertThat(res.status()).isEqualTo(<span class="n">200</span>);          <span class="c">// equals</span>
+
+  JsonObject b = JsonParser.parseString(res.text())
+                          .getAsJsonObject();
+  assertThat(b.has(<span class="s">"email"</span>)).isTrue();               <span class="c">// schema</span>
+  assertThat(b.get(<span class="s">"email"</span>).getAsString())
+      .matches(<span class="s">"^[\\w.+-]+@[\\w.-]+$"</span>);              <span class="c">// regex</span>
+
+  List&lt;String&gt; folders = names(b.getAsJsonArray(<span class="s">"folders"</span>));
+  assertThat(folders).contains(<span class="s">"Documents"</span>);          <span class="c">// contains</span>
+}</pre>
+                    <div class="callout"><strong>Tip:</strong> seed an authenticated session in a JUnit <code class="inline">@BeforeAll</code> / Playwright fixture so each test starts clean and isolated.</div>
+                </div>
+                <footer class="footer">
+                    <small>API-level methods in action</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 9: Example test 3 -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Example · Isolation &amp; UI</p>
+                    <h2>Predicate · Collection · Visual</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c">// Isolation — predicate over two users</span>
+<span class="m">@Test</span>
+<span class="k">void</span> usersCannotSeeEachOther() {
+  User a = users.register(<span class="s">"a@itc.edu"</span>, <span class="s">"pw"</span>);
+  User b = users.register(<span class="s">"b@itc.edu"</span>, <span class="s">"pw"</span>);
+  storage.upload(a, named(<span class="s">"secret.txt"</span>));
+
+  List&lt;String&gt; bFiles = storage.list(b, <span class="s">"/"</span>);
+  assertThat(bFiles).doesNotContain(<span class="s">"secret.txt"</span>)    <span class="c">// collection</span>
+                    .isEmpty();
+  assertThat(b).matches(                                <span class="c">// predicate</span>
+      x -&gt; storage.usedBytes(x) == <span class="n">0</span>, <span class="s">"b uses nothing"</span>);
+}
+
+<span class="c">// UI snapshot</span>
+assertThat(page.getByTestId(<span class="s">"quota"</span>)).hasText(<span class="s">"50 MB"</span>);
+Allure.addAttachment(<span class="s">"dashboard"</span>, <span class="s">"image/png"</span>,
+    <span class="k">new</span> ByteArrayInputStream(page.screenshot()), <span class="s">".png"</span>);</pre>
+                </div>
+                <footer class="footer">
+                    <small>Isolation is graded — prove it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 10: Allure reporting -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Reporting</p>
+                    <h2>Wire Up &amp; Generate Allure</h2>
+                </header>
+                <div class="content">
+                    <p>Annotate tests with <code class="inline">@Epic/@Feature/@Severity</code>, wrap phases in <code class="inline">Allure.step()</code>, attach JSON/screenshots, then build the report.</p>
+                    <pre class="code"><span class="c"># Run the suite (writes target/allure-results)</span>
+mvn test
+
+<span class="c"># View the report</span>
+allure serve target/allure-results
+<span class="c"># or persist it</span>
+allure generate target/allure-results --clean -o target/allure-report</pre>
+                    <div class="callout"><strong>Deliverable:</strong> commit the generated <code class="inline">allure-report/</code> (or screenshots of it) so reviewers can see your results without running anything. Group tests by <code class="inline">@Feature</code> so each method is easy to find.</div>
+                </div>
+                <footer class="footer">
+                    <small>Make every method visible</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 11: Repo layout & README -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Deliverable</p>
+                    <h2>Repository Layout</h2>
+                </header>
+                <div class="content">
+                    <pre class="code">private-cloud-storage/
+├── src/main/java/...        <span class="c"># Spring Boot app</span>
+├── src/test/java/...        <span class="c"># JUnit + Playwright tests</span>
+├── target/allure-report/    <span class="c"># generated report (or /screenshots)</span>
+├── .github/workflows/ci.yml <span class="c"># build + test + report (bonus)</span>
+├── pom.xml                  <span class="c"># or build.gradle</span>
+└── README.md                <span class="c"># see required contents →</span></pre>
+                    <div class="callout"><strong>README must include:</strong> how to run the app, how to run the tests, how to open the Allure report, and a <strong>table mapping each testing method → the test that demonstrates it</strong>.</div>
+                </div>
+                <footer class="footer">
+                    <small>A reviewer should run it in minutes</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 12: Submission -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">How to Submit</p>
+                    <h2>Submission Steps</h2>
+                </header>
+                <div class="content">
+                    <ol>
+                        <li>Create a <strong>public</strong> GitHub repository for your project.</li>
+                        <li>Commit the Spring Boot app, the test suite, and the Allure report (or screenshots).</li>
+                        <li>Make sure the repo builds and tests pass from a clean clone (<code class="inline">mvn test</code>).</li>
+                        <li>Copy the repository link, e.g. <code class="inline">https://github.com/&lt;you&gt;/private-cloud-storage</code>.</li>
+                        <li><strong>Submit the GitHub link to Moodle</strong> before the deadline.</li>
+                    </ol>
+                    <div class="callout"><strong>Check before you submit:</strong> repo is <em>public</em>, README explains how to run, and the method-mapping table is filled in. A private repo = it can't be graded.</div>
+                </div>
+                <footer class="footer">
+                    <small>GitHub (public) → Moodle</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 13: Rubric -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Grading</p>
+                    <h2>Assessment Rubric</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>Criterion</th><th>Weight</th></tr></thead>
+                        <tbody>
+                            <tr><td>App works: accounts, files/folders, quota, profile, delete</td><td>30%</td></tr>
+                            <tr><td>All 10 testing methods demonstrated &amp; mapped</td><td>30%</td></tr>
+                            <tr><td>User isolation correctly enforced &amp; tested</td><td>15%</td></tr>
+                            <tr><td>Allure report generated with steps/attachments</td><td>15%</td></tr>
+                            <tr><td>Clean README + repo runs from a fresh clone</td><td>10%</td></tr>
+                            <tr><td><em>Bonus:</em> CI pipeline publishing the report</td><td>+5%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>Tests and isolation carry the grade</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 14: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Wrap-Up</p>
+                    <h2>Lab 08 Checklist</h2>
+                </header>
+                <div class="content center">
+                    <ul>
+                        <li>✅ Spring Boot app: register (50&nbsp;MB), files &amp; folders, profile, self-delete.</li>
+                        <li>✅ Per-user isolation enforced everywhere.</li>
+                        <li>✅ JUnit + Playwright tests covering <strong>all ten</strong> testing methods.</li>
+                        <li>✅ Allure report with @Feature grouping, steps &amp; attachments.</li>
+                        <li>✅ README with run instructions + method-mapping table.</li>
+                        <li>✅ Public GitHub repo → link submitted to Moodle.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">Spring Boot</span>
+                        <span class="pill">JUnit + Playwright</span>
+                        <span class="pill">Allure</span>
+                        <span class="pill warn">Good luck!</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>End of Lab 08 · Private Cloud Storage App</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+            <div class="page-navigation">
+                <div class="page-numbers" id="pageNumbers"></div>
+                <span class="slide-counter" id="counter">1 / 14</span>
+            </div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+            </div>
+        </nav>
+    </main>
+
+    <script>
+        const slides = [...document.querySelectorAll(".slide")];
+        const progressBars = [...document.querySelectorAll(".bar")];
+        const counter = document.getElementById("counter");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        let index = 0;
+
+        function render() {
+            slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBars.forEach((bar) => { bar.style.width = `${progress}%`; });
+            counter.textContent = `${index + 1} / ${slides.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slides.length - 1;
+            prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+            nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+            generatePageNumbers();
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= slides.length) { index = n - 1; render(); }
+        }
+
+        function generatePageNumbers() {
+            const pageNumbers = document.getElementById("pageNumbers");
+            if (!pageNumbers) return;
+            pageNumbers.innerHTML = "";
+            const total = slides.length;
+            const current = index + 1;
+            const show = [];
+            if (total > 0) show.push(1);
+            for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+                if (!show.includes(i)) show.push(i);
+            }
+            if (total > 1 && !show.includes(total)) show.push(total);
+            show.sort((a, b) => a - b);
+            show.forEach((p, i) => {
+                if (i > 0 && p - show[i - 1] > 1) {
+                    const e = document.createElement("span");
+                    e.textContent = "...";
+                    e.className = "page-ellipsis";
+                    pageNumbers.appendChild(e);
+                }
+                const b = document.createElement("button");
+                b.textContent = p;
+                b.className = "page-number" + (p === current ? " active" : "");
+                b.onclick = () => goToSlide(p);
+                pageNumbers.appendChild(b);
+            });
+        }
+
+        function nextSlide() { index = Math.min(index + 1, slides.length - 1); render(); }
+        function prevSlide() { index = Math.max(index - 1, 0); render(); }
+
+        nextBtn.addEventListener("click", nextSlide);
+        prevBtn.addEventListener("click", prevSlide);
+
+        window.addEventListener("keydown", (e) => {
+            if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); nextSlide(); }
+            if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); prevSlide(); }
+        });
+
+        render();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 08 — Testing Methods: Java · JUnit · Playwright · Allure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #f7f3eb;
+            --bg-2: #f0e7d8;
+            --ink: #1d1a14;
+            --muted: #5f5346;
+            --accent: #e36b2c;
+            --accent-2: #0e7a86;
+            --card: rgba(255, 255, 255, 0.8);
+            --shadow: 0 14px 40px rgba(31, 20, 10, 0.14);
+            --code-bg: #1e2430;
+            --code-ink: #e6edf3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Space Grotesk", sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(14, 122, 134, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(227, 107, 44, 0.2), transparent 42%),
+                linear-gradient(140deg, var(--bg-1), var(--bg-2));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .deck {
+            width: min(1100px, 94vw);
+            height: min(720px, 94vh);
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slides {
+            flex: 1;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 0.8rem;
+            opacity: 0;
+            transform: translateX(50px) scale(0.98);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide h1,
+        .slide h2 {
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: 0.03em;
+            font-family: "Bebas Neue", sans-serif;
+        }
+
+        .slide h1 {
+            font-size: clamp(2.2rem, 7vw, 5rem);
+        }
+
+        .slide h2 {
+            font-size: clamp(1.6rem, 5vw, 3rem);
+        }
+
+        .kicker {
+            text-transform: uppercase;
+            color: var(--accent-2);
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            font-size: 0.84rem;
+            margin: 0 0 0.2rem;
+        }
+
+        .content {
+            display: grid;
+            align-content: start;
+            gap: 0.7rem;
+            font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        }
+
+        .content.center {
+            align-content: center;
+        }
+
+        .content p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 80ch;
+        }
+
+        .content ul,
+        .content ol {
+            margin: 0;
+            padding-left: 1.15rem;
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .content li::marker {
+            color: var(--accent);
+        }
+
+        .content li small {
+            color: var(--muted);
+        }
+
+        /* Code blocks */
+        pre.code {
+            margin: 0;
+            background: var(--code-bg);
+            color: var(--code-ink);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: clamp(0.72rem, 1.25vw, 0.92rem);
+            line-height: 1.55;
+            overflow-x: auto;
+            border: 1px solid rgba(14, 122, 134, 0.3);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            white-space: pre;
+        }
+
+        pre.code .k { color: #ff9d6e; }   /* keywords */
+        pre.code .s { color: #9ece6a; }   /* strings */
+        pre.code .m { color: #7dcfff; }   /* methods/annotations */
+        pre.code .c { color: #6b7689; font-style: italic; } /* comments */
+        pre.code .n { color: #e0af68; }   /* numbers */
+
+        code.inline {
+            font-family: "JetBrains Mono", monospace;
+            background: rgba(14, 122, 134, 0.12);
+            color: #0a4d56;
+            padding: 0.1rem 0.4rem;
+            border-radius: 5px;
+            font-size: 0.88em;
+        }
+
+        /* Tables */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.4rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(14, 122, 134, 0.15);
+            font-size: 0.92em;
+        }
+
+        .content table th,
+        .content table td {
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(14, 122, 134, 0.1);
+            vertical-align: top;
+        }
+
+        .content table th {
+            background: rgba(14, 122, 134, 0.1);
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: rgba(227, 107, 44, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0 10px 10px 0;
+            color: var(--muted);
+        }
+
+        .callout strong { color: var(--ink); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(14, 122, 134, 0.18);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+        }
+
+        .card h3 {
+            margin: 0 0 0.35rem;
+            color: var(--accent-2);
+            font-size: 1.05rem;
+        }
+
+        .pill-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            border-radius: 999px;
+            border: 1px solid rgba(14, 122, 134, 0.25);
+            background: rgba(14, 122, 134, 0.08);
+            color: #0a4d56;
+            padding: 0.32rem 0.78rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pill.warn {
+            border-color: rgba(227, 107, 44, 0.4);
+            background: rgba(227, 107, 44, 0.1);
+            color: #a8431a;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer small { color: var(--muted); }
+
+        .progress {
+            height: 6px;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 999px;
+            background: rgba(29, 26, 20, 0.1);
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), #f7a156);
+            transition: width 0.35s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem 0.9rem;
+            border-top: 1px solid rgba(93, 80, 64, 0.16);
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .page-navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-numbers {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-number {
+            border: none;
+            background: #ece6dc;
+            color: #4f4234;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-number:hover {
+            background: #ddd4c8;
+            transform: translateY(-1px);
+        }
+
+        .page-number.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .page-ellipsis {
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 0 0.2rem;
+        }
+
+        .nav-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        #prevBtn { background: #ece6dc; color: #4f4234; }
+        #nextBtn { background: var(--accent); color: #fff; }
+
+        .slide-counter { color: var(--muted); font-weight: 600; }
+
+        .nav-controls { display: flex; gap: 0.6rem; align-items: center; }
+
+        @media (max-width: 760px) {
+            .deck { height: 100vh; width: 100vw; border-radius: 0; border: none; }
+            .slide { padding: 1.1rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 0.5rem; padding: 0.8rem; }
+            .page-navigation { order: -1; }
+            .footer { flex-direction: column; align-items: flex-start; }
+            .progress { max-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="deck">
+        <section class="slides" id="slides">
+
+            <!-- 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Lesson 08 · Lecture</p>
+                    <h1>Testing Methods &amp; Assertion Strategies</h1>
+                </header>
+                <div class="content center">
+                    <p>How do we decide a test has <strong>passed</strong>? This lesson tours the core ways to verify behaviour — <strong>content equals</strong>, <strong>contains</strong>, <strong>regex matched</strong>, <strong>formula matched</strong> and more — with worked examples in <strong>Java</strong>, <strong>JUnit&nbsp;5</strong> and <strong>Playwright for Java</strong>, all reported through <strong>Allure</strong>.</p>
+                    <div class="pill-row">
+                        <span class="pill">Java 17</span>
+                        <span class="pill">JUnit 5</span>
+                        <span class="pill">Playwright (Java)</span>
+                        <span class="pill">AssertJ / Hamcrest</span>
+                        <span class="pill">Allure Report</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Automation Testing · Lesson 08</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 2: Objectives -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Objectives</p>
+                    <h2>What You Will Learn</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>What an <strong>assertion</strong> is and why the <em>matching method</em> matters.</li>
+                        <li>The catalogue of testing methods: equality, contains, regex, formula, predicate, collection, exception, tolerance, schema &amp; visual.</li>
+                        <li>How to express each one in <strong>JUnit 5</strong>, <strong>AssertJ</strong> and <strong>Hamcrest</strong>.</li>
+                        <li>How to apply the same methods to UI &amp; API checks with <strong>Playwright for Java</strong>.</li>
+                        <li>How to surface every check in an <strong>Allure</strong> report with steps &amp; attachments.</li>
+                        <li>How to choose the <em>right</em> method for each situation.</li>
+                    </ul>
+                    <div class="callout"><strong>Prerequisites:</strong> JDK 17+, Maven or Gradle, basic Java, and the Allure CLI (needs a JRE).</div>
+                </div>
+                <footer class="footer">
+                    <small>From "it ran" to "it's correct"</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 3: What is an assertion -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>What Is a Testing Method?</h2>
+                </header>
+                <div class="content">
+                    <p>A test does three things — <strong>Arrange</strong>, <strong>Act</strong>, <strong>Assert</strong>. The <em>testing method</em> is the rule used in the <strong>Assert</strong> step that decides whether the actual result matches the expectation.</p>
+                    <pre class="code"><span class="m">@Test</span>
+<span class="k">void</span> additionWorks() {
+  Calculator calc = <span class="k">new</span> Calculator();   <span class="c">// Arrange</span>
+  <span class="k">int</span> result = calc.add(<span class="n">2</span>, <span class="n">3</span>);          <span class="c">// Act</span>
+  assertEquals(<span class="n">5</span>, result);              <span class="c">// Assert (content equals)</span>
+}</pre>
+                    <div class="callout"><strong>Key idea:</strong> the same value can be verified many ways. Picking the matching method that fits the intent makes tests both <em>strict enough</em> to catch bugs and <em>loose enough</em> to survive harmless change.</div>
+                </div>
+                <footer class="footer">
+                    <small>Arrange · Act · Assert</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 4: The catalogue -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Map of the Lesson</p>
+                    <h2>The Catalogue of Methods</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>Method</th><th>Asks…</th><th>Typical use</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Content equals</strong></td><td>Is it exactly this value?</td><td>IDs, totals, status codes</td></tr>
+                            <tr><td><strong>Contains</strong></td><td>Does it include this part?</td><td>Messages, lists, HTML</td></tr>
+                            <tr><td><strong>Regex matched</strong></td><td>Does it fit this pattern?</td><td>Emails, tokens, dates</td></tr>
+                            <tr><td><strong>Formula matched</strong></td><td>Does it satisfy a rule?</td><td>Computed / derived values</td></tr>
+                            <tr><td><strong>Predicate</strong></td><td>Is this condition true?</td><td>Custom business logic</td></tr>
+                            <tr><td><strong>Collection</strong></td><td>Right items, right order?</td><td>Folder listings, results</td></tr>
+                            <tr><td><strong>Exception</strong></td><td>Did it fail correctly?</td><td>Validation, limits</td></tr>
+                            <tr><td><strong>Tolerance / range</strong></td><td>Close enough?</td><td>Floats, timings, sizes</td></tr>
+                            <tr><td><strong>Schema / JSON</strong></td><td>Right shape?</td><td>API contracts</td></tr>
+                            <tr><td><strong>Visual / snapshot</strong></td><td>Looks the same?</td><td>UI screenshots</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <footer class="footer">
+                    <small>Ten ways to say "correct"</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 5: Tooling -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">The Toolbox</p>
+                    <h2>JUnit · AssertJ · Hamcrest</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-3">
+                        <div class="card">
+                            <h3>JUnit 5</h3>
+                            <p>The test engine + basic <code class="inline">Assertions.*</code> (<code class="inline">assertEquals</code>, <code class="inline">assertTrue</code>, <code class="inline">assertThrows</code>).</p>
+                        </div>
+                        <div class="card">
+                            <h3>AssertJ</h3>
+                            <p>Fluent, readable chains: <code class="inline">assertThat(x).isEqualTo(...).contains(...).matches(...)</code>.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Hamcrest</h3>
+                            <p>Composable <em>matchers</em>: <code class="inline">assertThat(x, allOf(containsString(...), matchesPattern(...)))</code>.</p>
+                        </div>
+                    </div>
+                    <pre class="code"><span class="c">&lt;!-- pom.xml — test dependencies --&gt;</span>
+&lt;dependency&gt;&lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+  &lt;artifactId&gt;junit-jupiter&lt;/artifactId&gt;&lt;version&gt;<span class="s">5.10.2</span>&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;dependency&gt;&lt;groupId&gt;org.assertj&lt;/groupId&gt;
+  &lt;artifactId&gt;assertj-core&lt;/artifactId&gt;&lt;version&gt;<span class="s">3.25.3</span>&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;dependency&gt;&lt;groupId&gt;com.microsoft.playwright&lt;/groupId&gt;
+  &lt;artifactId&gt;playwright&lt;/artifactId&gt;&lt;version&gt;<span class="s">1.44.0</span>&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;dependency&gt;&lt;groupId&gt;io.qameta.allure&lt;/groupId&gt;
+  &lt;artifactId&gt;allure-junit5&lt;/artifactId&gt;&lt;version&gt;<span class="s">2.27.0</span>&lt;/version&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;</pre>
+                </div>
+                <footer class="footer">
+                    <small>Three assertion styles, one report</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 6: Content equals -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 1</p>
+                    <h2>Content Equals</h2>
+                </header>
+                <div class="content">
+                    <p>The strictest check: actual must be <strong>exactly equal</strong> to expected (by <code class="inline">equals()</code>). Best for deterministic values — IDs, counts, totals, status codes, enum results.</p>
+                    <pre class="code"><span class="m">@Test</span>
+<span class="m">@DisplayName</span>(<span class="s">"New user is granted exactly 50 MB"</span>)
+<span class="k">void</span> newUserQuota() {
+  User u = service.register(<span class="s">"mara@itc.edu"</span>, <span class="s">"pass123"</span>);
+
+  <span class="c">// JUnit</span>
+  assertEquals(<span class="n">50</span> * <span class="n">1024</span> * <span class="n">1024</span>, u.getQuotaBytes());
+
+  <span class="c">// AssertJ — fluent</span>
+  assertThat(u.getQuotaBytes()).isEqualTo(<span class="n">52_428_800L</span>);
+  assertThat(u.getEmail()).isEqualTo(<span class="s">"mara@itc.edu"</span>);
+}</pre>
+                    <div class="callout"><strong>Watch out:</strong> equality on objects uses <code class="inline">equals()</code>/<code class="inline">hashCode()</code>. For value objects, override them (or use a record) so equality compares <em>content</em>, not reference.</div>
+                </div>
+                <footer class="footer">
+                    <small>isEqualTo · assertEquals</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 7: Contains -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 2</p>
+                    <h2>Contains / Substring</h2>
+                </header>
+                <div class="content">
+                    <p>Verifies a <strong>part</strong> is present without pinning the whole value. Ideal when surrounding text may change but a key fragment must appear.</p>
+                    <pre class="code"><span class="c">// String fragment</span>
+String msg = service.uploadTooBig(file);
+assertThat(msg).contains(<span class="s">"quota exceeded"</span>)
+               .doesNotContain(<span class="s">"stack trace"</span>);
+
+<span class="c">// Collection membership</span>
+List&lt;String&gt; folders = storage.listFolders(user);
+assertThat(folders).contains(<span class="s">"Documents"</span>, <span class="s">"Photos"</span>);
+
+<span class="c">// Hamcrest equivalent</span>
+assertThat(msg, containsString(<span class="s">"quota exceeded"</span>));</pre>
+                    <div class="callout"><strong>Use when:</strong> the message/format is partly dynamic (timestamps, ids) but a stable signal must be present.</div>
+                </div>
+                <footer class="footer">
+                    <small>contains · containsString</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 8: Regex matched -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 3</p>
+                    <h2>Regex Matched</h2>
+                </header>
+                <div class="content">
+                    <p>Asserts the value <strong>fits a pattern</strong>. Perfect for formatted strings whose <em>shape</em> is fixed even though the content varies — emails, UUIDs, share links, dates.</p>
+                    <pre class="code"><span class="c">// A generated share link must look like /s/{8 hex chars}</span>
+String link = storage.createShareLink(fileId);
+
+<span class="c">// AssertJ</span>
+assertThat(link).matches(<span class="s">"/s/[0-9a-f]{8}"</span>);
+
+<span class="c">// JUnit + java.util.regex</span>
+assertTrue(Pattern.matches(<span class="s">"/s/[0-9a-f]{8}"</span>, link));
+
+<span class="c">// Hamcrest</span>
+assertThat(user.getEmail(),
+    matchesPattern(<span class="s">"^[\\w.+-]+@[\\w-]+\\.[\\w.-]+$"</span>));</pre>
+                    <div class="callout"><strong>matches vs find:</strong> <code class="inline">matches()</code> requires the <em>whole</em> string to fit. To check a pattern appears <em>somewhere</em>, anchor loosely or use <code class="inline">Matcher.find()</code>.</div>
+                </div>
+                <footer class="footer">
+                    <small>matches · matchesPattern</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 9: Formula matched -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 4</p>
+                    <h2>Formula Matched</h2>
+                </header>
+                <div class="content">
+                    <p>Instead of a hard-coded literal, the expected value is <strong>computed from a rule</strong>. The test encodes the <em>relationship</em> the code must uphold — great for derived quantities.</p>
+                    <pre class="code"><span class="c">// Rule: free space = quota − sum(file sizes)</span>
+<span class="m">@Test</span>
+<span class="k">void</span> freeSpaceFollowsFormula() {
+  storage.upload(user, file(<span class="n">10</span> * MB));
+  storage.upload(user, file(<span class="n">15</span> * MB));
+
+  <span class="k">long</span> usedExpected = (<span class="n">10</span> + <span class="n">15</span>) * MB;          <span class="c">// the formula</span>
+  <span class="k">long</span> freeExpected = user.getQuotaBytes() - usedExpected;
+
+  assertThat(storage.usedBytes(user)).isEqualTo(usedExpected);
+  assertThat(storage.freeBytes(user)).isEqualTo(freeExpected);
+}</pre>
+                    <div class="callout"><strong>Why it's powerful:</strong> the assertion stays correct even if inputs change, because expected is <em>derived the same way the spec defines it</em> — not copied from a single run. (Property-based testing pushes this further.)</div>
+                </div>
+                <footer class="footer">
+                    <small>expected = f(inputs)</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 10: Predicate / condition -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 5</p>
+                    <h2>Predicate / Condition</h2>
+                </header>
+                <div class="content">
+                    <p>When no built-in matcher fits, assert an arbitrary <strong>boolean condition</strong> — a lambda that captures custom business logic.</p>
+                    <pre class="code"><span class="c">// AssertJ — matches(Predicate)</span>
+assertThat(user)
+    .matches(u -&gt; u.getQuotaBytes() &gt;= u.getUsedBytes(),
+             <span class="s">"never over quota"</span>);
+
+<span class="c">// AssertJ — satisfies(...) for multiple facts</span>
+assertThat(savedFile).satisfies(f -&gt; {
+    assertThat(f.getOwner()).isEqualTo(user.getId());
+    assertThat(f.getName()).isNotBlank();
+    assertThat(f.getCreatedAt()).isBeforeOrEqualTo(Instant.now());
+});
+
+<span class="c">// JUnit fallback</span>
+assertTrue(user.getQuotaBytes() &gt;= user.getUsedBytes());</pre>
+                </div>
+                <footer class="footer">
+                    <small>matches(Predicate) · satisfies</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 11: Collection matching -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 6</p>
+                    <h2>Collection Matching</h2>
+                </header>
+                <div class="content">
+                    <p>Folder listings and query results are collections. Assert <strong>size, membership, order and uniqueness</strong> precisely.</p>
+                    <pre class="code">List&lt;String&gt; names = storage.list(user, <span class="s">"/Documents"</span>);
+
+assertThat(names)
+    .hasSize(<span class="n">3</span>)
+    .containsExactly(<span class="s">"a.txt"</span>, <span class="s">"b.txt"</span>, <span class="s">"c.txt"</span>)  <span class="c">// order matters</span>
+    .doesNotHaveDuplicates();
+
+<span class="c">// order-independent</span>
+assertThat(names).containsExactlyInAnyOrder(<span class="s">"c.txt"</span>, <span class="s">"a.txt"</span>, <span class="s">"b.txt"</span>);
+
+<span class="c">// extract a field from objects, then assert</span>
+assertThat(files).extracting(File::getName)
+                 .contains(<span class="s">"report.pdf"</span>);</pre>
+                    <div class="callout"><strong>Pick the strictness:</strong> <code class="inline">containsExactly</code> (order) vs <code class="inline">containsExactlyInAnyOrder</code> vs <code class="inline">contains</code> (subset) — match the guarantee your API actually makes.</div>
+                </div>
+                <footer class="footer">
+                    <small>hasSize · containsExactly · extracting</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 12: Exception matching -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 7</p>
+                    <h2>Exception Matching</h2>
+                </header>
+                <div class="content">
+                    <p>Failing correctly is a feature. Assert that the right <strong>exception type</strong> is thrown <em>and</em> carries the right message.</p>
+                    <pre class="code"><span class="m">@Test</span>
+<span class="m">@DisplayName</span>(<span class="s">"Upload beyond quota is rejected"</span>)
+<span class="k">void</span> overQuotaThrows() {
+  QuotaExceededException ex = assertThrows(
+      QuotaExceededException.class,
+      () -&gt; storage.upload(user, file(<span class="n">60</span> * MB)));   <span class="c">// quota is 50 MB</span>
+
+  assertThat(ex.getMessage())
+      .contains(<span class="s">"quota"</span>)
+      .matches(<span class="s">".*\\d+ *MB.*"</span>);          <span class="c">// mentions a size</span>
+}
+
+<span class="c">// And the negative: a valid op must NOT throw</span>
+assertDoesNotThrow(() -&gt; storage.upload(user, file(<span class="n">5</span> * MB)));</pre>
+                </div>
+                <footer class="footer">
+                    <small>assertThrows · assertDoesNotThrow</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 13: Tolerance / range -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 8</p>
+                    <h2>Tolerance &amp; Range</h2>
+                </header>
+                <div class="content">
+                    <p>Floating-point math and timings are rarely exact. Assert "close enough" with a tolerance, or that a value lies within a range.</p>
+                    <pre class="code"><span class="c">// Floating point — never use plain equals on doubles</span>
+<span class="k">double</span> usedMb = storage.usedBytes(user) / <span class="n">1_048_576.0</span>;
+assertThat(usedMb).isCloseTo(<span class="n">25.0</span>, within(<span class="n">0.01</span>));     <span class="c">// AssertJ</span>
+assertEquals(<span class="n">25.0</span>, usedMb, <span class="n">0.01</span>);                  <span class="c">// JUnit delta</span>
+
+<span class="c">// Numeric range</span>
+assertThat(storage.freeBytes(user))
+    .isBetween(<span class="n">0L</span>, user.getQuotaBytes());
+
+<span class="c">// Performance budget</span>
+assertThat(elapsedMs).isLessThan(<span class="n">800</span>);</pre>
+                    <div class="callout"><strong>Rule:</strong> comparing <code class="inline">double</code>/<code class="inline">float</code> with exact equality is a classic bug. Always allow an epsilon.</div>
+                </div>
+                <footer class="footer">
+                    <small>isCloseTo · within · isBetween</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 14: Schema / JSON -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 9</p>
+                    <h2>Schema / JSON Matching</h2>
+                </header>
+                <div class="content">
+                    <p>For APIs, assert the response <strong>shape</strong>, not just one field. Combine path extraction with the methods above.</p>
+                    <pre class="code"><span class="c">// Playwright API response → JSON</span>
+APIResponse res = request.get(<span class="s">"/api/me"</span>);
+assertThat(res.status()).isEqualTo(<span class="n">200</span>);
+
+JsonObject body = <span class="k">new</span> Gson()
+    .fromJson(res.text(), JsonObject.class);
+
+assertThat(body.has(<span class="s">"email"</span>)).isTrue();          <span class="c">// field present</span>
+assertThat(body.get(<span class="s">"email"</span>).getAsString())
+    .matches(<span class="s">"^[\\w.+-]+@[\\w.-]+$"</span>);              <span class="c">// regex method</span>
+assertThat(body.get(<span class="s">"quotaBytes"</span>).getAsLong())
+    .isEqualTo(<span class="n">52_428_800L</span>);                      <span class="c">// content equals</span></pre>
+                    <div class="callout"><strong>Contract testing:</strong> for full schema validation pipe the body into a JSON-Schema validator (e.g. <code class="inline">networknt/json-schema-validator</code>) and assert there are zero violations.</div>
+                </div>
+                <footer class="footer">
+                    <small>shape + fields, together</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 15: Visual / snapshot -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Method 10</p>
+                    <h2>Visual / Snapshot Matching</h2>
+                </header>
+                <div class="content">
+                    <p>For UI, compare the rendered page against a stored <strong>golden image</strong> or a captured snapshot, allowing a small pixel difference.</p>
+                    <pre class="code"><span class="c">// Playwright for Java — auto-waiting web assertions</span>
+assertThat(page.getByText(<span class="s">"My Cloud Storage"</span>)).isVisible();
+assertThat(page).hasTitle(Pattern.compile(<span class="s">"Cloud.*"</span>));   <span class="c">// regex method</span>
+assertThat(page.getByTestId(<span class="s">"quota-bar"</span>))
+    .hasAttribute(<span class="s">"aria-valuenow"</span>, <span class="s">"50"</span>);
+
+<span class="c">// Pixel snapshot — fails if the UI drifts</span>
+byte[] shot = page.screenshot();
+Allure.addAttachment(<span class="s">"dashboard"</span>, <span class="s">"image/png"</span>,
+    <span class="k">new</span> ByteArrayInputStream(shot), <span class="s">".png"</span>);</pre>
+                    <div class="callout"><strong>Note:</strong> Playwright's Java <code class="inline">assertThat(locator)</code> auto-waits and retries — no manual sleeps. Use it for state; use screenshots for look-and-feel.</div>
+                </div>
+                <footer class="footer">
+                    <small>web assertions + screenshots</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 16: Playwright end-to-end -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Putting It Together</p>
+                    <h2>A Playwright Test Using Many Methods</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="m">@Test</span>
+<span class="k">void</span> registerAndSeeQuota() {
+  page.navigate(<span class="s">"http://localhost:8080/register"</span>);
+  page.getByLabel(<span class="s">"Email"</span>).fill(<span class="s">"sok@itc.edu"</span>);
+  page.getByLabel(<span class="s">"Password"</span>).fill(<span class="s">"Secret123!"</span>);
+  page.getByRole(AriaRole.BUTTON,
+      <span class="k">new</span> Page.GetByRoleOptions().setName(<span class="s">"Sign up"</span>)).click();
+
+  <span class="c">// contains</span>
+  assertThat(page.getByRole(AriaRole.HEADING))
+      .containsText(<span class="s">"Welcome"</span>);
+  <span class="c">// regex</span>
+  assertThat(page).hasURL(Pattern.compile(<span class="s">".*/dashboard$"</span>));
+  <span class="c">// content equals</span>
+  assertThat(page.getByTestId(<span class="s">"quota"</span>)).hasText(<span class="s">"50 MB"</span>);
+}</pre>
+                    <div class="callout">One scenario naturally exercises <strong>contains</strong>, <strong>regex</strong> and <strong>content equals</strong> — most real tests blend methods.</div>
+                </div>
+                <footer class="footer">
+                    <small>Blend methods per scenario</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 17: Allure annotations -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Reporting</p>
+                    <h2>Reporting with Allure</h2>
+                </header>
+                <div class="content">
+                    <p>Wrap logical phases in <code class="inline">Allure.step(...)</code> and attach evidence so every assertion is traceable in the report.</p>
+                    <pre class="code"><span class="m">@Test</span>
+<span class="m">@Epic</span>(<span class="s">"Storage"</span>) <span class="m">@Feature</span>(<span class="s">"Quota"</span>) <span class="m">@Severity</span>(SeverityLevel.CRITICAL)
+<span class="k">void</span> quotaEnforced() {
+  Allure.step(<span class="s">"Register user (50 MB)"</span>, () -&gt; {
+    service.register(<span class="s">"lina@itc.edu"</span>, <span class="s">"pw"</span>);
+  });
+
+  Allure.step(<span class="s">"Upload beyond quota is rejected"</span>, () -&gt; {
+    assertThrows(QuotaExceededException.class,
+        () -&gt; storage.upload(user, file(<span class="n">60</span> * MB)));
+  });
+
+  Allure.addAttachment(<span class="s">"usage.json"</span>, storage.usageJson(user));
+}</pre>
+                </div>
+                <footer class="footer">
+                    <small>@Epic · @Feature · step · attachment</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 18: Generate the report -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">See Results</p>
+                    <h2>Generating the Allure Report</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># 1) Run tests → writes raw JSON to target/allure-results/</span>
+mvn test
+<span class="c"># (Gradle: ./gradlew test)</span>
+
+<span class="c"># 2a) Quick: serve a temporary report (auto-opens browser)</span>
+allure serve target/allure-results
+
+<span class="c"># 2b) Persisted: build static HTML</span>
+allure generate target/allure-results --clean -o target/allure-report
+allure open target/allure-report</pre>
+                    <div class="callout"><strong>Maven tip:</strong> add the <code class="inline">io.qameta.allure:allure-maven</code> plugin so <code class="inline">mvn allure:report</code> wires results &amp; history automatically. Keep <code class="inline">allure-results/</code> between runs to grow trend graphs.</div>
+                </div>
+                <footer class="footer">
+                    <small>results → report → history</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 19: Choosing the method -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Judgement</p>
+                    <h2>Choosing the Right Method</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Deterministic value?</strong> → content equals. Don't be looser than you must.</li>
+                        <li><strong>Dynamic surroundings, stable fragment?</strong> → contains.</li>
+                        <li><strong>Fixed format, variable content?</strong> → regex.</li>
+                        <li><strong>Value derived from inputs?</strong> → formula (compute the expectation).</li>
+                        <li><strong>Custom rule?</strong> → predicate / satisfies.</li>
+                        <li><strong>Floats &amp; timings?</strong> → tolerance / range, never exact equals.</li>
+                        <li><strong>Error path?</strong> → exception matching (type + message).</li>
+                    </ul>
+                    <div class="callout"><strong>Goldilocks principle:</strong> a good assertion fails when behaviour breaks and <em>only</em> then. Too strict = brittle; too loose = blind.</div>
+                </div>
+                <footer class="footer">
+                    <small>Strict enough, loose enough</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 20: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Wrap-Up</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content center">
+                    <ul>
+                        <li>A <strong>testing method</strong> is the rule that decides pass/fail — choose it deliberately.</li>
+                        <li>Master the catalogue: <strong>equals, contains, regex, formula</strong>, predicate, collection, exception, tolerance, schema, visual.</li>
+                        <li><strong>JUnit + AssertJ + Hamcrest</strong> express them all; <strong>Playwright (Java)</strong> brings them to UI &amp; API.</li>
+                        <li><strong>Allure</strong> makes each check visible with steps, severity &amp; attachments.</li>
+                        <li>Match strictness to the guarantee — strict for deterministic, looser for variable.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">content equals</span>
+                        <span class="pill">contains</span>
+                        <span class="pill">regex</span>
+                        <span class="pill">formula</span>
+                        <span class="pill warn">Lab 08 next →</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>End of Lesson 08 · Testing Methods</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+            <div class="page-navigation">
+                <div class="page-numbers" id="pageNumbers"></div>
+                <span class="slide-counter" id="counter">1 / 20</span>
+            </div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+            </div>
+        </nav>
+    </main>
+
+    <script>
+        const slides = [...document.querySelectorAll(".slide")];
+        const progressBars = [...document.querySelectorAll(".bar")];
+        const counter = document.getElementById("counter");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        let index = 0;
+
+        function render() {
+            slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBars.forEach((bar) => { bar.style.width = `${progress}%`; });
+            counter.textContent = `${index + 1} / ${slides.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slides.length - 1;
+            prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+            nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+            generatePageNumbers();
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= slides.length) { index = n - 1; render(); }
+        }
+
+        function generatePageNumbers() {
+            const pageNumbers = document.getElementById("pageNumbers");
+            if (!pageNumbers) return;
+            pageNumbers.innerHTML = "";
+            const total = slides.length;
+            const current = index + 1;
+            const show = [];
+            if (total > 0) show.push(1);
+            for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+                if (!show.includes(i)) show.push(i);
+            }
+            if (total > 1 && !show.includes(total)) show.push(total);
+            show.sort((a, b) => a - b);
+            show.forEach((p, i) => {
+                if (i > 0 && p - show[i - 1] > 1) {
+                    const e = document.createElement("span");
+                    e.textContent = "...";
+                    e.className = "page-ellipsis";
+                    pageNumbers.appendChild(e);
+                }
+                const b = document.createElement("button");
+                b.textContent = p;
+                b.className = "page-number" + (p === current ? " active" : "");
+                b.onclick = () => goToSlide(p);
+                pageNumbers.appendChild(b);
+            });
+        }
+
+        function nextSlide() { index = Math.min(index + 1, slides.length - 1); render(); }
+        function prevSlide() { index = Math.max(index - 1, 0); render(); }
+
+        nextBtn.addEventListener("click", nextSlide);
+        prevBtn.addEventListener("click", prevSlide);
+
+        window.addEventListener("keydown", (e) => {
+            if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); nextSlide(); }
+            if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); prevSlide(); }
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
