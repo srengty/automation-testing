@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 09 — Jenkins: From Installation to Pipelines, Plugins &amp; Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #f7f3eb;
+            --bg-2: #f0e7d8;
+            --ink: #1d1a14;
+            --muted: #5f5346;
+            --accent: #e36b2c;
+            --accent-2: #0e7a86;
+            --card: rgba(255, 255, 255, 0.8);
+            --shadow: 0 14px 40px rgba(31, 20, 10, 0.14);
+            --code-bg: #1e2430;
+            --code-ink: #e6edf3;
+            --ok: #2f8f4e;
+            --no: #c0392b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Space Grotesk", sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(14, 122, 134, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(227, 107, 44, 0.2), transparent 42%),
+                linear-gradient(140deg, var(--bg-1), var(--bg-2));
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .deck {
+            width: min(1100px, 94vw);
+            height: min(720px, 94vh);
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slides {
+            flex: 1;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 0.8rem;
+            opacity: 0;
+            transform: translateX(50px) scale(0.98);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .slide h1,
+        .slide h2 {
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: 0.03em;
+            font-family: "Bebas Neue", sans-serif;
+        }
+
+        .slide h1 {
+            font-size: clamp(2.2rem, 7vw, 5rem);
+        }
+
+        .slide h2 {
+            font-size: clamp(1.6rem, 5vw, 3rem);
+        }
+
+        .kicker {
+            text-transform: uppercase;
+            color: var(--accent-2);
+            letter-spacing: 0.14em;
+            font-weight: 700;
+            font-size: 0.84rem;
+            margin: 0 0 0.2rem;
+        }
+
+        .content {
+            display: grid;
+            align-content: start;
+            gap: 0.7rem;
+            font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        }
+
+        .content.center {
+            align-content: center;
+        }
+
+        .content p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 80ch;
+        }
+
+        .content ul,
+        .content ol {
+            margin: 0;
+            padding-left: 1.15rem;
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .content li::marker {
+            color: var(--accent);
+        }
+
+        .content li small {
+            color: var(--muted);
+        }
+
+        /* Code blocks */
+        pre.code {
+            margin: 0;
+            background: var(--code-bg);
+            color: var(--code-ink);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: clamp(0.72rem, 1.25vw, 0.92rem);
+            line-height: 1.55;
+            overflow-x: auto;
+            border: 1px solid rgba(14, 122, 134, 0.3);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            white-space: pre;
+        }
+
+        pre.code .k { color: #ff9d6e; }   /* keywords */
+        pre.code .s { color: #9ece6a; }   /* strings */
+        pre.code .m { color: #7dcfff; }   /* methods/annotations */
+        pre.code .c { color: #6b7689; font-style: italic; } /* comments */
+        pre.code .n { color: #e0af68; }   /* numbers */
+        pre.mono { font-family: consolas, monospace; }
+
+        code.inline {
+            font-family: "JetBrains Mono", monospace;
+            background: rgba(14, 122, 134, 0.12);
+            color: #0a4d56;
+            padding: 0.1rem 0.4rem;
+            border-radius: 5px;
+            font-size: 0.88em;
+        }
+
+        /* Tables */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.4rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(14, 122, 134, 0.15);
+            font-size: 0.92em;
+        }
+
+        .content table th,
+        .content table td {
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(14, 122, 134, 0.1);
+            vertical-align: top;
+        }
+
+        .content table th {
+            background: rgba(14, 122, 134, 0.1);
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent);
+            background: rgba(227, 107, 44, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0 10px 10px 0;
+            color: var(--muted);
+        }
+
+        .callout strong { color: var(--ink); }
+
+        /* Exercise box */
+        .exercise {
+            border-left: 4px solid var(--accent-2);
+            background: rgba(14, 122, 134, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0 10px 10px 0;
+            color: var(--muted);
+        }
+        .exercise .tag {
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--accent-2);
+            margin-bottom: 0.3rem;
+        }
+        .exercise strong { color: var(--ink); }
+        .exercise ol { margin: 0.3rem 0 0; padding-left: 1.15rem; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(14, 122, 134, 0.18);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+        }
+
+        .card h3 {
+            margin: 0 0 0.35rem;
+            color: var(--accent-2);
+            font-size: 1.05rem;
+        }
+
+        .pill-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            border-radius: 999px;
+            border: 1px solid rgba(14, 122, 134, 0.25);
+            background: rgba(14, 122, 134, 0.08);
+            color: #0a4d56;
+            padding: 0.32rem 0.78rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pill.warn {
+            border-color: rgba(227, 107, 44, 0.4);
+            background: rgba(227, 107, 44, 0.1);
+            color: #a8431a;
+        }
+
+        /* Quiz */
+        .quiz {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(227, 107, 44, 0.3);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            display: grid;
+            gap: 0.6rem;
+        }
+        .quiz .q-label {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .quiz .q-text { font-weight: 600; color: var(--ink); }
+        .quiz .options { display: grid; gap: 0.45rem; }
+        .quiz .option {
+            text-align: left;
+            border: 1px solid rgba(14, 122, 134, 0.25);
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--ink);
+            border-radius: 10px;
+            padding: 0.55rem 0.8rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: flex;
+            gap: 0.55rem;
+            align-items: flex-start;
+        }
+        .quiz .option:hover { background: rgba(14, 122, 134, 0.1); transform: translateY(-1px); }
+        .quiz .option .mark { font-weight: 700; min-width: 1.4em; }
+        .quiz .option.correct {
+            border-color: var(--ok);
+            background: rgba(47, 143, 78, 0.14);
+            color: #1d5e33;
+        }
+        .quiz .option.incorrect {
+            border-color: var(--no);
+            background: rgba(192, 57, 43, 0.12);
+            color: #8c241a;
+        }
+        .quiz .option:disabled { cursor: default; }
+        .quiz .explain {
+            display: none;
+            border-radius: 10px;
+            padding: 0.55rem 0.8rem;
+            background: rgba(47, 143, 78, 0.1);
+            color: #1d5e33;
+            font-size: 0.9rem;
+            border: 1px solid rgba(47, 143, 78, 0.3);
+        }
+        .quiz .explain.show { display: block; }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer small { color: var(--muted); }
+
+        .progress {
+            height: 6px;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 999px;
+            background: rgba(29, 26, 20, 0.1);
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), #f7a156);
+            transition: width 0.35s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem 0.9rem;
+            border-top: 1px solid rgba(93, 80, 64, 0.16);
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .page-navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-numbers {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-number {
+            border: none;
+            background: #ece6dc;
+            color: #4f4234;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-number:hover {
+            background: #ddd4c8;
+            transform: translateY(-1px);
+        }
+
+        .page-number.active {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .page-ellipsis {
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 0 0.2rem;
+        }
+
+        .nav-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        #prevBtn { background: #ece6dc; color: #4f4234; }
+        #nextBtn { background: var(--accent); color: #fff; }
+
+        .slide-counter { color: var(--muted); font-weight: 600; }
+
+        .nav-controls { display: flex; gap: 0.6rem; align-items: center; }
+
+        @media (max-width: 760px) {
+            .deck { height: 100vh; width: 100vw; border-radius: 0; border: none; }
+            .slide { padding: 1.1rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 0.5rem; padding: 0.8rem; }
+            .page-navigation { order: -1; }
+            .footer { flex-direction: column; align-items: flex-start; }
+            .progress { max-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="deck">
+        <section class="slides" id="slides">
+
+            <!-- 1: Title -->
+            <article class="slide active">
+                <header>
+                    <p class="kicker">Lesson 09 · Lecture</p>
+                    <h1>Jenkins: Automate Everything</h1>
+                </header>
+                <div class="content center">
+                    <p>The complete tour of <strong>Jenkins</strong> — the open-source automation server that powers Continuous Integration &amp; Continuous Delivery. We go from <strong>installation</strong> all the way through <strong>freestyle jobs</strong>, <strong>pipelines</strong>, <strong>credentials</strong>, <strong>distributed agents</strong>, <strong>plugins</strong>, <strong>security</strong> and <strong>maintenance</strong> — each feature with a <strong>short quiz</strong> and a <strong>hands-on exercise</strong>.</p>
+                    <div class="pill-row">
+                        <span class="pill">Jenkins LTS</span>
+                        <span class="pill">CI / CD</span>
+                        <span class="pill">Declarative Pipeline</span>
+                        <span class="pill">Agents</span>
+                        <span class="pill">Plugins</span>
+                        <span class="pill">Credentials</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Automation Testing · Lesson 09</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 2: Objectives -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Objectives</p>
+                    <h2>What You Will Learn</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li>What Jenkins is, where it fits in <strong>CI/CD</strong>, and its <strong>controller/agent</strong> architecture.</li>
+                        <li><strong>Install</strong> Jenkins four ways: WAR, native package (Linux), Windows installer, and Docker.</li>
+                        <li>Complete the <strong>setup wizard</strong>, manage <strong>plugins</strong>, and tour the dashboard.</li>
+                        <li>Build <strong>Freestyle jobs</strong> and <strong>Pipelines</strong> (declarative &amp; scripted) with a <code class="inline">Jenkinsfile</code>.</li>
+                        <li>Use <strong>triggers</strong>, <strong>parameters</strong>, <strong>environment variables</strong> and <strong>credentials</strong>.</li>
+                        <li>Scale with <strong>agents/nodes</strong>, integrate <strong>SCM/Multibranch</strong>, publish <strong>artifacts &amp; test reports</strong>.</li>
+                        <li>Send <strong>notifications</strong>, reuse <strong>shared libraries</strong>, lock down <strong>security</strong>, and run <strong>backups</strong>.</li>
+                    </ul>
+                    <div class="callout"><strong>Format:</strong> after each feature you'll find a <em>short quiz</em> (click to check) and, where applicable, a <em>practical exercise</em> to do in your own Jenkins.</div>
+                </div>
+                <footer class="footer">
+                    <small>From "manual builds" to "fully automated delivery"</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 3: What is Jenkins -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>What Is Jenkins?</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Jenkins</strong> is a free, open-source <strong>automation server</strong> written in Java. It listens for events (a code push, a schedule, a manual click), then runs a defined sequence of steps — <em>build → test → report → deploy</em>.</p>
+                    <div class="grid-3">
+                        <div class="card"><h3>Continuous Integration</h3><p>Every commit is built &amp; tested automatically, catching breakage early.</p></div>
+                        <div class="card"><h3>Continuous Delivery</h3><p>Passing builds are packaged and promoted toward production, repeatably.</p></div>
+                        <div class="card"><h3>Extensible</h3><p>1,800+ plugins integrate Git, Docker, Kubernetes, cloud, Slack and more.</p></div>
+                    </div>
+                    <div class="callout"><strong>Why it's everywhere:</strong> it's vendor-neutral, self-hostable, scriptable as code (<code class="inline">Jenkinsfile</code>), and has the largest plugin ecosystem in CI.</div>
+                </div>
+                <footer class="footer">
+                    <small>An automation server for the whole delivery pipeline</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 4: Architecture -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Foundations</p>
+                    <h2>Controller &amp; Agent Architecture</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Controller (formerly "master")</h3>
+                            <p>The brain: serves the web UI, stores config &amp; build history, schedules jobs, and dispatches work to agents.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Agent (formerly "slave"/node)</h3>
+                            <p>A worker machine (or container) that actually runs builds. Connect via SSH, JNLP/inbound, or Docker/Kubernetes.</p>
+                        </div>
+                    </div>
+                    <pre class="code mono"><span class="c">  ┌─────────────┐  dispatch   ┌──────────┐</span>
+<span class="c">  │ Controller  │ ──────────► │ Agent A  │  (Linux, builds Java)</span>
+<span class="c">  │  (UI+brain) │ ──────────► │ Agent B  │  (Windows, builds .NET)</span>
+<span class="c">  └─────────────┘             │ Agent C  │  (Docker, ephemeral)</span>
+<span class="c">                              └──────────┘</span></pre>
+                    <div class="callout"><strong>Best practice:</strong> keep the controller for orchestration only and run builds on agents. Never run heavy builds on the controller in production.</div>
+                </div>
+                <footer class="footer">
+                    <small>One brain, many workers</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 5: Prerequisites -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Installation</p>
+                    <h2>Prerequisites</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Java:</strong> a supported JDK/JRE — Jenkins LTS needs <strong>Java 17 or 21</strong>.</li>
+                        <li><strong>Memory:</strong> 256 MB minimum; <strong>4 GB+ RAM</strong> recommended for a small team.</li>
+                        <li><strong>Disk:</strong> 10 GB+ for <code class="inline">JENKINS_HOME</code> (jobs, builds, plugins grow over time).</li>
+                        <li><strong>Port:</strong> default web UI on <code class="inline">8080</code>; agent port configurable.</li>
+                        <li><strong>Browser &amp; network</strong> access to download plugins from the update center.</li>
+                    </ul>
+                    <pre class="code"><span class="c"># Verify Java first</span>
+java -version
+<span class="c"># openjdk version "17.x" ...  → good for Jenkins LTS</span></pre>
+                    <div class="callout"><strong><code class="inline">JENKINS_HOME</code></strong> is the single most important directory — it holds <em>all</em> config, jobs and history. Back it up and you can rebuild the whole server.</div>
+                </div>
+                <footer class="footer">
+                    <small>Java 17/21 · RAM · disk · port 8080</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 6: Installation methods -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Installation</p>
+                    <h2>Four Ways to Install</h2>
+                </header>
+                <div class="content">
+                    <pre class="code"><span class="c"># 1) Portable WAR — runs anywhere Java runs</span>
+java -jar jenkins.war --httpPort=8080
+
+<span class="c"># 2) Linux (Debian/Ubuntu) — native package + systemd service</span>
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/" | \
+  sudo tee /etc/apt/sources.list.d/jenkins.list
+sudo apt-get update &amp;&amp; sudo apt-get install jenkins
+sudo systemctl enable --now jenkins
+
+<span class="c"># 3) Windows — download the .msi installer (runs as a Windows service)</span>
+
+<span class="c"># 4) Docker — official LTS image with JDK 17</span>
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk17</pre>
+                    <div class="callout"><strong>Pick by context:</strong> WAR for quick trials, native package for a permanent Linux server, MSI for Windows shops, Docker for reproducible/ephemeral setups.</div>
+                </div>
+                <footer class="footer">
+                    <small>WAR · apt/yum · MSI · Docker</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 7: Quiz + Exercise: Installation -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Installation</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">Which directory holds all of Jenkins' configuration, jobs and build history?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>/etc/jenkins/plugins</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>JENKINS_HOME (e.g. /var/jenkins_home)</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>/tmp/jenkins-build</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>The jenkins.war file itself</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — <code class="inline">JENKINS_HOME</code> is the source of truth. Back it up to migrate or restore the whole instance.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Get Jenkins running.</strong>
+                        <ol>
+                            <li>Confirm <code class="inline">java -version</code> shows 17 or 21.</li>
+                            <li>Start Jenkins via Docker <em>or</em> <code class="inline">java -jar jenkins.war</code>.</li>
+                            <li>Open <code class="inline">http://localhost:8080</code> and confirm the "Unlock Jenkins" page appears.</li>
+                            <li>Locate your <code class="inline">JENKINS_HOME</code> and list its contents.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 8: Setup wizard -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">First Run</p>
+                    <h2>The Setup Wizard</h2>
+                </header>
+                <div class="content">
+                    <ol>
+                        <li><strong>Unlock Jenkins:</strong> paste the initial admin password printed in the log / found on disk.</li>
+                        <li><strong>Install plugins:</strong> choose "Install suggested plugins" (Git, Pipeline, etc.) or select your own.</li>
+                        <li><strong>Create the first admin user</strong> (username, password, email).</li>
+                        <li><strong>Confirm the Jenkins URL</strong> used in links &amp; webhooks.</li>
+                    </ol>
+                    <pre class="code"><span class="c"># Where to find the initial admin password</span>
+<span class="c"># Linux package:</span>
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+<span class="c"># Docker:</span>
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+<span class="c"># WAR:</span>
+cat ~/.jenkins/secrets/initialAdminPassword</pre>
+                    <div class="callout"><strong>Don't skip the admin user:</strong> running as the throwaway admin disables important security defaults.</div>
+                </div>
+                <footer class="footer">
+                    <small>unlock → plugins → admin user → URL</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 9: Quiz + Exercise: Setup -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · First-Run Setup</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">On first launch, how do you "Unlock Jenkins"?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Type any password you like — it sets it</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Use admin / admin</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Paste the password from secrets/initialAdminPassword</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Disable security in jenkins.war</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — Jenkins generates a one-time password on disk to prove you control the server before any account exists.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Finish the wizard.</strong>
+                        <ol>
+                            <li>Retrieve the initial admin password using the command for your install method.</li>
+                            <li>Install the <em>suggested plugins</em>.</li>
+                            <li>Create an admin user named <code class="inline">trainer</code> with your email.</li>
+                            <li>Log out and log back in with the new account.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 10: Dashboard tour -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Orientation</p>
+                    <h2>Dashboard Tour</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>Area</th><th>What it does</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>New Item</strong></td><td>Create a job: Freestyle, Pipeline, Multibranch, Folder…</td></tr>
+                            <tr><td><strong>Build queue / Executors</strong></td><td>Shows pending and running builds and where they run.</td></tr>
+                            <tr><td><strong>Manage Jenkins</strong></td><td>System config, plugins, nodes, credentials, security, tools.</td></tr>
+                            <tr><td><strong>People</strong></td><td>Users and their activity.</td></tr>
+                            <tr><td><strong>Build History</strong></td><td>Timeline of recent builds across jobs.</td></tr>
+                            <tr><td><strong>Job status icons</strong></td><td>Weather (trend) + colored ball (last result: blue/green = pass, red = fail).</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout"><strong>Manage Jenkins</strong> is your control room — nearly every administrative feature in this lesson lives there.</div>
+                </div>
+                <footer class="footer">
+                    <small>Know where everything lives</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 11: Freestyle jobs -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Jobs</p>
+                    <h2>Freestyle Jobs</h2>
+                </header>
+                <div class="content">
+                    <p>The classic point-and-click job. You configure sections in the UI: <strong>source code</strong>, <strong>triggers</strong>, <strong>build steps</strong>, and <strong>post-build actions</strong>.</p>
+                    <div class="grid-2">
+                        <div class="card"><h3>Build steps</h3><p>"Execute shell" / "Execute Windows batch", "Invoke Maven/Gradle", "Invoke Ant".</p></div>
+                        <div class="card"><h3>Post-build actions</h3><p>Archive artifacts, publish JUnit results, email, trigger downstream jobs.</p></div>
+                    </div>
+                    <pre class="code"><span class="c"># Example "Execute shell" build step</span>
+echo "Building commit $GIT_COMMIT on $NODE_NAME"
+mvn -B clean test
+echo "Done at build #$BUILD_NUMBER"</pre>
+                    <div class="callout"><strong>When to use:</strong> great for learning and simple tasks. For anything real &amp; repeatable, prefer <em>Pipeline</em> so the definition lives in source control.</div>
+                </div>
+                <footer class="footer">
+                    <small>UI-driven, single-stage jobs</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 12: Quiz + Exercise: Freestyle -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Freestyle Jobs</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">Which is a <em>post-build action</em> rather than a build step?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Execute shell</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Invoke top-level Maven targets</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Archive the artifacts</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Execute Windows batch command</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — archiving artifacts, publishing test results and triggering downstream jobs run <em>after</em> the build, in post-build actions.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Create your first job.</strong>
+                        <ol>
+                            <li>New Item → <em>Freestyle project</em> named <code class="inline">hello-freestyle</code>.</li>
+                            <li>Add an "Execute shell" (or batch) step that prints <code class="inline">$BUILD_NUMBER</code> and the date.</li>
+                            <li>Save and click <strong>Build Now</strong>.</li>
+                            <li>Open the build → <strong>Console Output</strong> and confirm your text appears.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 13: Build triggers -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Triggers</p>
+                    <h2>Build Triggers</h2>
+                </header>
+                <div class="content">
+                    <table>
+                        <thead><tr><th>Trigger</th><th>Fires when…</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Poll SCM</strong></td><td>Jenkins checks the repo on a schedule and builds if it changed.</td></tr>
+                            <tr><td><strong>Webhook (push)</strong></td><td>The SCM (GitHub/GitLab) notifies Jenkins instantly on a push.</td></tr>
+                            <tr><td><strong>Build periodically</strong></td><td>On a fixed cron schedule, regardless of changes.</td></tr>
+                            <tr><td><strong>Upstream</strong></td><td>After another job finishes.</td></tr>
+                            <tr><td><strong>Remote / API</strong></td><td>An external system calls the build URL with a token.</td></tr>
+                        </tbody>
+                    </table>
+                    <pre class="code"><span class="c"># Jenkins cron: MIN HOUR DOM MONTH DOW</span>
+H/15 * * * *      <span class="c"># every ~15 min (H spreads load)</span>
+H 2 * * 1-5       <span class="c"># ~2 AM on weekdays</span>
+@midnight         <span class="c"># alias for H H(0-2) * * *</span></pre>
+                    <div class="callout"><strong>Use <code class="inline">H</code> ("hash"):</strong> it spreads jobs across the interval so they don't all fire at the same minute and overload the controller.</div>
+                </div>
+                <footer class="footer">
+                    <small>poll · webhook · cron · upstream · remote</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 14: Quiz + Exercise: Triggers -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Triggers</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">What does <code class="inline">H/15 * * * *</code> mean in a Jenkins schedule?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Build exactly at minute 15 every hour</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Build roughly every 15 minutes, hashed to spread load</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Build 15 times per day</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Build every 15 hours</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — <code class="inline">H</code> picks a stable but distributed value, so many jobs don't all run at minute :00.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Schedule a build.</strong>
+                        <ol>
+                            <li>In <code class="inline">hello-freestyle</code> → Configure → <em>Build Triggers</em>.</li>
+                            <li>Enable "Build periodically" with <code class="inline">H/5 * * * *</code>.</li>
+                            <li>Wait (or click the "?" to see the next run times) and confirm an automatic build appears.</li>
+                            <li><em>Bonus:</em> enable "Poll SCM" on a Git repo and push a change to trigger it.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 15: Pipeline intro -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Pipeline</p>
+                    <h2>Pipeline as Code (Jenkinsfile)</h2>
+                </header>
+                <div class="content">
+                    <p>A <strong>Pipeline</strong> defines your whole delivery process in a <code class="inline">Jenkinsfile</code> stored <em>in your repo</em> — versioned, reviewable, and reusable. Two styles: <strong>Declarative</strong> (structured, recommended) and <strong>Scripted</strong> (full Groovy).</p>
+                    <pre class="code"><span class="c">// Declarative Jenkinsfile — the essentials</span>
+<span class="m">pipeline</span> {
+  agent any
+  stages {
+    stage(<span class="s">'Build'</span>)  { steps { sh <span class="s">'mvn -B clean compile'</span> } }
+    stage(<span class="s">'Test'</span>)   { steps { sh <span class="s">'mvn test'</span> } }
+    stage(<span class="s">'Package'</span>){ steps { sh <span class="s">'mvn package -DskipTests'</span> } }
+  }
+  post {
+    always  { junit <span class="s">'**/target/surefire-reports/*.xml'</span> }
+    success { echo <span class="s">'✔ Pipeline green'</span> }
+    failure { echo <span class="s">'✗ Build failed'</span> }
+  }
+}</pre>
+                    <div class="callout"><strong>Why pipelines win:</strong> code review, history, branch-specific behavior, and they survive a controller restart (durable).</div>
+                </div>
+                <footer class="footer">
+                    <small>The whole pipeline, in version control</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 16: Pipeline anatomy -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Pipeline</p>
+                    <h2>Anatomy: agent · stages · steps · post</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-2">
+                        <div class="card"><h3>agent</h3><p>Where it runs — <code class="inline">any</code>, a labelled node, or a <code class="inline">docker</code> image.</p></div>
+                        <div class="card"><h3>stages / stage</h3><p>Named phases shown as columns in the Stage View / Blue Ocean.</p></div>
+                        <div class="card"><h3>steps</h3><p>The actual work: <code class="inline">sh</code>, <code class="inline">bat</code>, <code class="inline">echo</code>, <code class="inline">git</code>, <code class="inline">archiveArtifacts</code>…</p></div>
+                        <div class="card"><h3>post</h3><p>Cleanup &amp; reporting: <code class="inline">always</code>, <code class="inline">success</code>, <code class="inline">failure</code>, <code class="inline">unstable</code>.</p></div>
+                    </div>
+                    <pre class="code"><span class="m">pipeline</span> {
+  agent { docker { image <span class="s">'maven:3.9-eclipse-temurin-17'</span> } }
+  options { timeout(time: <span class="n">20</span>, unit: <span class="s">'MINUTES'</span>); retry(<span class="n">2</span>) }
+  stages {
+    stage(<span class="s">'Test'</span>) {
+      steps { sh <span class="s">'mvn -B test'</span> }
+      post  { always { junit <span class="s">'**/surefire-reports/*.xml'</span> } }
+    }
+  }
+}</pre>
+                    <div class="callout"><strong>Tip:</strong> a <code class="inline">docker</code> agent gives every build a clean, identical toolchain — no "works on my agent" drift.</div>
+                </div>
+                <footer class="footer">
+                    <small>Four blocks you'll use constantly</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 17: Quiz + Exercise: Pipeline -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Pipeline</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">In a declarative pipeline, which block runs steps <em>after</em> the stages, e.g. to publish test results even on failure?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>agent</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>environment</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>post</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>triggers</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — <code class="inline">post { always { … } }</code> runs regardless of result, ideal for publishing reports and cleanup.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Create a Pipeline job.</strong>
+                        <ol>
+                            <li>New Item → <em>Pipeline</em> named <code class="inline">hello-pipeline</code>.</li>
+                            <li>Paste a 3-stage declarative pipeline (Build/Test/Deploy) using <code class="inline">echo</code> steps.</li>
+                            <li>Add a <code class="inline">post { always { echo 'done' } }</code> block.</li>
+                            <li>Build it and view the <strong>Stage View</strong> with one column per stage.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 18: Scripted pipeline -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Pipeline</p>
+                    <h2>Scripted Pipeline &amp; Logic</h2>
+                </header>
+                <div class="content">
+                    <p>Scripted pipelines are full <strong>Groovy</strong> — loops, conditionals, functions. Declarative can also drop into Groovy via a <code class="inline">script { }</code> block. Use logic for fan-out, conditional stages and dynamic steps.</p>
+                    <pre class="code"><span class="c">// Scripted</span>
+node {
+  stage(<span class="s">'Build'</span>) { sh <span class="s">'make build'</span> }
+  <span class="k">if</span> (env.BRANCH_NAME == <span class="s">'main'</span>) {
+    stage(<span class="s">'Deploy'</span>) { sh <span class="s">'make deploy'</span> }
+  }
+}
+
+<span class="c">// Declarative with a conditional stage</span>
+stage(<span class="s">'Deploy'</span>) {
+  when { branch <span class="s">'main'</span> }
+  steps { sh <span class="s">'make deploy'</span> }
+}
+
+<span class="c">// Parallel branches</span>
+stage(<span class="s">'Tests'</span>) {
+  parallel {
+    stage(<span class="s">'Unit'</span>) { steps { sh <span class="s">'mvn test'</span> } }
+    stage(<span class="s">'Lint'</span>) { steps { sh <span class="s">'mvn checkstyle:check'</span> } }
+  }
+}</pre>
+                    <div class="callout"><strong>Rule of thumb:</strong> prefer <strong>declarative</strong> for readability; reach for <strong>scripted</strong>/<code class="inline">script{}</code> only when you need real programming.</div>
+                </div>
+                <footer class="footer">
+                    <small>when · parallel · script · Groovy</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 19: Parameters -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Parameters</p>
+                    <h2>Parameterized Builds</h2>
+                </header>
+                <div class="content">
+                    <p>Parameters let one job take input at build time — environment to deploy, version to release, whether to run smoke tests. Jenkins shows a "Build with Parameters" form.</p>
+                    <pre class="code"><span class="m">pipeline</span> {
+  agent any
+  parameters {
+    choice(name: <span class="s">'ENV'</span>, choices: [<span class="s">'dev'</span>, <span class="s">'staging'</span>, <span class="s">'prod'</span>], description: <span class="s">'Target'</span>)
+    string(name: <span class="s">'VERSION'</span>, defaultValue: <span class="s">'1.0.0'</span>)
+    booleanParam(name: <span class="s">'RUN_SMOKE'</span>, defaultValue: <span class="k">true</span>)
+  }
+  stages {
+    stage(<span class="s">'Deploy'</span>) {
+      steps { sh <span class="s">"./deploy.sh --env ${params.ENV} --version ${params.VERSION}"</span> }
+    }
+  }
+}</pre>
+                    <div class="callout"><strong>Access them</strong> via <code class="inline">params.NAME</code>. The first run "registers" the params; subsequent runs show the form.</div>
+                </div>
+                <footer class="footer">
+                    <small>choice · string · boolean · password</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 20: Quiz + Exercise: Parameters -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Parameters</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">How do you read a parameter named <code class="inline">ENV</code> inside a declarative pipeline?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>$ENV directly with no prefix</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>params.ENV</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>inputs.ENV</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>jenkins.getParam('ENV')</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — parameters are exposed on the <code class="inline">params</code> object, e.g. <code class="inline">${params.ENV}</code>.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Parameterize a job.</strong>
+                        <ol>
+                            <li>Add a <code class="inline">choice</code> param <code class="inline">ENV</code> (dev/staging/prod) and a <code class="inline">string</code> param <code class="inline">VERSION</code> to <code class="inline">hello-pipeline</code>.</li>
+                            <li>Echo <code class="inline">"Deploying ${params.VERSION} to ${params.ENV}"</code>.</li>
+                            <li>Run once to register, then "Build with Parameters" choosing <code class="inline">staging</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 21: Env & Credentials -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Credentials</p>
+                    <h2>Environment Variables &amp; Credentials</h2>
+                </header>
+                <div class="content">
+                    <p>Never hard-code secrets. Store them in the <strong>Credentials</strong> store (encrypted in <code class="inline">JENKINS_HOME</code>) and bind them at runtime; they're masked in logs.</p>
+                    <pre class="code"><span class="m">pipeline</span> {
+  agent any
+  environment {
+    APP_ENV   = <span class="s">'staging'</span>
+    REGISTRY  = <span class="s">'registry.itc.edu'</span>
+    <span class="c">// inject a "Secret text" credential by its ID</span>
+    API_TOKEN = credentials(<span class="s">'prod-api-token'</span>)
+  }
+  stages {
+    stage(<span class="s">'Push'</span>) {
+      steps {
+        <span class="c">// username/password credential → two vars</span>
+        withCredentials([usernamePassword(credentialsId: <span class="s">'dockerhub'</span>,
+            usernameVariable: <span class="s">'U'</span>, passwordVariable: <span class="s">'P'</span>)]) {
+          sh <span class="s">'echo "$P" | docker login -u "$U" --password-stdin $REGISTRY'</span>
+        }
+      }
+    }
+  }
+}</pre>
+                    <div class="callout"><strong>Credential kinds:</strong> Secret text, Username/Password, SSH key, Secret file, Certificate. Scope them per-folder for least privilege.</div>
+                </div>
+                <footer class="footer">
+                    <small>credentials() · withCredentials · masking</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 22: Quiz + Exercise: Credentials -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Credentials</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">What happens to a credential's value when it's printed in the build log?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>It's shown in plain text — avoid echoing it</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Jenkins masks it as **** in the console output</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>The build fails immediately</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>It's emailed to the admin</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — bound credentials are automatically masked in logs. (Still, don't deliberately echo secrets.)</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Use a secret safely.</strong>
+                        <ol>
+                            <li>Manage Jenkins → Credentials → add a <em>Secret text</em> with ID <code class="inline">demo-token</code>.</li>
+                            <li>In a pipeline, set <code class="inline">environment { TOKEN = credentials('demo-token') }</code>.</li>
+                            <li>Run <code class="inline">sh 'echo Token length: ${#TOKEN}'</code> and confirm the value is masked.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 23: Plugins -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Plugins</p>
+                    <h2>Managing Plugins</h2>
+                </header>
+                <div class="content">
+                    <p>Plugins are how Jenkins gains features. Install/update them in <strong>Manage Jenkins → Plugins</strong>. Essential ones you'll meet:</p>
+                    <div class="grid-3">
+                        <div class="card"><h3>Pipeline</h3><p>Pipeline + Stage View, the core of pipeline-as-code.</p></div>
+                        <div class="card"><h3>Git / GitHub</h3><p>Clone repos, react to webhooks, build PRs.</p></div>
+                        <div class="card"><h3>Credentials Binding</h3><p>Inject secrets into builds.</p></div>
+                        <div class="card"><h3>JUnit / Allure</h3><p>Publish &amp; trend test results.</p></div>
+                        <div class="card"><h3>Blue Ocean</h3><p>Modern visual pipeline UI.</p></div>
+                        <div class="card"><h3>Docker / Kubernetes</h3><p>Run builds in containers / dynamic agents.</p></div>
+                    </div>
+                    <div class="callout"><strong>Hygiene:</strong> update plugins regularly (security fixes), but stage updates on a test controller first. Too many plugins = slower startup &amp; more risk.</div>
+                </div>
+                <footer class="footer">
+                    <small>1,800+ plugins — install only what you need</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 24: Quiz: Plugins -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Plugins</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">Where do you install and update plugins?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>By editing the jenkins.war file</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Manage Jenkins → Plugins (Update Center)</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>In each job's Configure page</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Only via the Jenkins REST API</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — the Update Center under Manage Jenkins → Plugins handles available/installed/updates. (Advanced: upload <code class="inline">.hpi</code> manually or use the API.)</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Add a plugin.</strong>
+                        <ol>
+                            <li>Manage Jenkins → Plugins → Available.</li>
+                            <li>Search for and install <em>Blue Ocean</em> (or <em>Allure</em>).</li>
+                            <li>Restart if prompted, then open the new menu item it adds.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 25: Distributed builds -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Agents</p>
+                    <h2>Distributed Builds (Nodes/Agents)</h2>
+                </header>
+                <div class="content">
+                    <p>Add <strong>agents</strong> to run builds in parallel and on different platforms. Manage them in <strong>Manage Jenkins → Nodes</strong>. Target an agent with <strong>labels</strong>.</p>
+                    <pre class="code"><span class="c">// Pin a pipeline to an agent by label</span>
+<span class="m">pipeline</span> {
+  agent { label <span class="s">'linux &amp;&amp; docker'</span> }   <span class="c">// boolean label expressions</span>
+  stages { stage(<span class="s">'Build'</span>) { steps { sh <span class="s">'uname -a'</span> } } }
+}
+
+<span class="c">// Per-stage agents (different tools per stage)</span>
+stage(<span class="s">'Windows tests'</span>) {
+  agent { label <span class="s">'windows'</span> }
+  steps { bat <span class="s">'mvn -B test'</span> }
+}</pre>
+                    <div class="callout"><strong>Connection types:</strong> SSH (controller connects out), Inbound/JNLP (agent connects in), or cloud plugins that spin up <em>ephemeral</em> Docker/Kubernetes agents on demand.</div>
+                </div>
+                <footer class="footer">
+                    <small>labels · executors · ephemeral agents</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 26: Quiz + Exercise: Agents -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Agents</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">How do you make a pipeline run on a specific group of agents?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Set the executor count to 1</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Use agent { label '…' } matching the agents' labels</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Rename the job to match the agent</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Agents are chosen randomly and can't be targeted</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — labels + <code class="inline">agent { label '…' }</code> route builds to nodes with matching capabilities.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Add an agent.</strong>
+                        <ol>
+                            <li>Manage Jenkins → Nodes → New Node (Permanent agent).</li>
+                            <li>Give it the label <code class="inline">demo-agent</code> and connect it (SSH, or run an inbound agent locally / in Docker).</li>
+                            <li>Set a pipeline to <code class="inline">agent { label 'demo-agent' }</code> and confirm the build runs there (<code class="inline">$NODE_NAME</code>).</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 27: Multibranch & SCM -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · SCM Integration</p>
+                    <h2>Multibranch Pipelines &amp; GitHub</h2>
+                </header>
+                <div class="content">
+                    <p>A <strong>Multibranch Pipeline</strong> auto-discovers every branch (and PR) that contains a <code class="inline">Jenkinsfile</code> and creates a sub-job for each — branches come and go automatically.</p>
+                    <ul>
+                        <li>New Item → <strong>Multibranch Pipeline</strong> → point it at your Git/GitHub repo.</li>
+                        <li>Jenkins scans branches; any with a <code class="inline">Jenkinsfile</code> become buildable.</li>
+                        <li>Add a <strong>webhook</strong> so pushes trigger scans/builds instantly.</li>
+                        <li>Use <code class="inline">when { branch 'main' }</code> for branch-specific behavior.</li>
+                    </ul>
+                    <pre class="code"><span class="c"># GitHub webhook → Jenkins</span>
+Payload URL : https://jenkins.itc.edu/github-webhook/
+Content type: application/json
+Events      : Just the push event (+ Pull requests)</pre>
+                    <div class="callout"><strong>Org Folders</strong> go further: scan an entire GitHub org and onboard every repo with a Jenkinsfile automatically.</div>
+                </div>
+                <footer class="footer">
+                    <small>one Jenkinsfile, every branch &amp; PR</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 28: Quiz + Exercise: Multibranch -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Multibranch</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">What must a branch contain for a Multibranch Pipeline to build it?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>A README.md</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>A tag named 'build'</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>A Jenkinsfile at the configured path</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>An open pull request</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — branches with a discoverable <code class="inline">Jenkinsfile</code> become sub-jobs automatically; others are skipped.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Wire up a repo.</strong>
+                        <ol>
+                            <li>Push a <code class="inline">Jenkinsfile</code> to a Git repo on <code class="inline">main</code> and a <code class="inline">feature/*</code> branch.</li>
+                            <li>New Item → Multibranch Pipeline → set the repo source.</li>
+                            <li>Click "Scan Repository Now" and confirm both branches appear and build.</li>
+                            <li><em>Bonus:</em> add a GitHub webhook and push to trigger a build automatically.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 29: Artifacts -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Artifacts</p>
+                    <h2>Archiving Artifacts &amp; Fingerprints</h2>
+                </header>
+                <div class="content">
+                    <p>Save build outputs (jars, reports, binaries) so they're downloadable from the build page and reusable downstream. <strong>Fingerprints</strong> track a file's MD5 across jobs to trace "which build produced this?".</p>
+                    <pre class="code"><span class="m">pipeline</span> {
+  agent any
+  stages {
+    stage(<span class="s">'Package'</span>) {
+      steps { sh <span class="s">'mvn -B clean package -DskipTests'</span> }
+      post {
+        success {
+          archiveArtifacts artifacts: <span class="s">'target/*.jar'</span>,
+                           fingerprint: <span class="k">true</span>,
+                           onlyIfSuccessful: <span class="k">true</span>
+        }
+      }
+    }
+  }
+}
+
+<span class="c">// Reuse a file produced earlier in the SAME run</span>
+stash name: <span class="s">'app'</span>, includes: <span class="s">'target/*.jar'</span>
+unstash <span class="s">'app'</span></pre>
+                    <div class="callout"><strong>Artifacts vs stash:</strong> <em>archive</em> for long-term, cross-build download; <em>stash/unstash</em> to pass files between stages/agents within one run.</div>
+                </div>
+                <footer class="footer">
+                    <small>archiveArtifacts · fingerprint · stash</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 30: Test reports -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Reporting</p>
+                    <h2>Publishing Test Reports</h2>
+                </header>
+                <div class="content">
+                    <p>Turn raw test output into trends and drill-downs on the build page. JUnit XML is the lingua franca; Allure and HTML add rich reports.</p>
+                    <pre class="code"><span class="c">// JUnit results + trend graph</span>
+post { always { junit <span class="s">'**/target/surefire-reports/*.xml'</span> } }
+
+<span class="c">// Allure report (requires the Allure plugin + commandline)</span>
+post {
+  always {
+    allure includeProperties: <span class="k">false</span>,
+           results: [[path: <span class="s">'target/allure-results'</span>]]
+  }
+}
+
+<span class="c">// Generic HTML report (HTML Publisher plugin)</span>
+publishHTML(target: [reportDir: <span class="s">'target/site'</span>,
+                     reportFiles: <span class="s">'index.html'</span>,
+                     reportName: <span class="s">'Coverage'</span>])</pre>
+                    <div class="callout"><strong>Tie-in with Lesson 08:</strong> the same Allure results you generated can be published per-build here, giving history &amp; trends across runs.</div>
+                </div>
+                <footer class="footer">
+                    <small>junit · allure · publishHTML</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 31: Quiz + Exercise: Reports -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Artifacts &amp; Reports</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">You need to pass a built <code class="inline">.jar</code> from a Build stage to a Deploy stage <em>within the same run</em>. Best tool?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>archiveArtifacts only</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>stash in Build, unstash in Deploy</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Email the jar to yourself</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Commit the jar to Git</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — <code class="inline">stash</code>/<code class="inline">unstash</code> moves files between stages/agents in one run; <code class="inline">archiveArtifacts</code> is for durable, downloadable outputs.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Publish results.</strong>
+                        <ol>
+                            <li>In a Maven project pipeline, run <code class="inline">mvn test</code>.</li>
+                            <li>Add <code class="inline">post { always { junit '**/surefire-reports/*.xml' } }</code>.</li>
+                            <li>Add <code class="inline">archiveArtifacts 'target/*.jar'</code> and confirm the Test Result trend + downloadable jar appear.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 32: Notifications -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Notifications</p>
+                    <h2>Notifications</h2>
+                </header>
+                <div class="content">
+                    <p>Tell the team when builds break (and recover). Configure SMTP in <strong>Manage Jenkins → System</strong>, then notify from <code class="inline">post</code>.</p>
+                    <pre class="code"><span class="m">post</span> {
+  failure {
+    mail to: <span class="s">'team@itc.edu'</span>,
+         subject: <span class="s">"FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}"</span>,
+         body: <span class="s">"See ${env.BUILD_URL}"</span>
+  }
+  fixed   { slackSend channel: <span class="s">'#ci'</span>, message: <span class="s">"Recovered ✔ ${env.JOB_NAME}"</span> }
+  unstable{ slackSend channel: <span class="s">'#ci'</span>, color: <span class="s">'warning'</span>, message: <span class="s">'Tests unstable'</span> }
+}</pre>
+                    <div class="callout"><strong>Signal, not noise:</strong> notify on <code class="inline">failure</code> and <code class="inline">fixed</code> (state changes) rather than every single build, or people tune it out.</div>
+                </div>
+                <footer class="footer">
+                    <small>email · Slack · Teams · webhooks</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 33: Shared Libraries -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Reuse</p>
+                    <h2>Shared Libraries</h2>
+                </header>
+                <div class="content">
+                    <p>Extract common pipeline code into a versioned Git repo and reuse it across all projects — DRY pipelines. Define under <strong>Manage Jenkins → System → Global Pipeline Libraries</strong>.</p>
+                    <pre class="code"><span class="c">// vars/buildJava.groovy  (in the shared library repo)</span>
+<span class="k">def</span> call(Map cfg = [:]) {
+  pipeline {
+    agent any
+    stages {
+      stage(<span class="s">'Build'</span>) { steps { sh <span class="s">"mvn -B ${cfg.goals ?: 'clean verify'}"</span> } }
+    }
+  }
+}
+
+<span class="c">// Jenkinsfile in a consuming project — one line!</span>
+@Library(<span class="s">'itc-shared'</span>) _
+buildJava(goals: <span class="s">'clean test'</span>)</pre>
+                    <div class="callout"><strong>Structure:</strong> <code class="inline">vars/</code> for global steps, <code class="inline">src/</code> for Groovy classes, <code class="inline">resources/</code> for files. Pin a version/tag with <code class="inline">@Library('itc-shared@v2')</code>.</div>
+                </div>
+                <footer class="footer">
+                    <small>vars/ · src/ · @Library</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 34: Quiz: Shared libs -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Shared Libraries</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">In a shared library, where do reusable global pipeline <em>steps</em> (callable by name) live?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>resources/</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>vars/</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>target/</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>.github/</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — files in <code class="inline">vars/</code> become global variables/steps (e.g. <code class="inline">buildJava()</code>); <code class="inline">src/</code> holds classes, <code class="inline">resources/</code> holds non-Groovy files.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Build a tiny library.</strong>
+                        <ol>
+                            <li>Create a Git repo with <code class="inline">vars/sayHello.groovy</code> defining <code class="inline">def call(name){ echo "Hello ${name}" }</code>.</li>
+                            <li>Register it as a Global Pipeline Library named <code class="inline">itc-shared</code>.</li>
+                            <li>In a pipeline: <code class="inline">@Library('itc-shared') _</code> then <code class="inline">sayHello('ITC')</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 35: Security -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Security</p>
+                    <h2>Security &amp; Access Control</h2>
+                </header>
+                <div class="content">
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>Authentication (who?)</h3>
+                            <p>Jenkins' own user database, or LDAP / SSO / GitHub OAuth via plugins.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Authorization (what?)</h3>
+                            <p>Matrix-based or <strong>Role-Based</strong> (Role Strategy plugin): grant read/build/admin per group/folder.</p>
+                        </div>
+                    </div>
+                    <ul>
+                        <li>Keep <strong>CSRF protection</strong> and agent-to-controller access control <em>on</em>.</li>
+                        <li>Use the <strong>Script Security</strong> sandbox; approve scripts deliberately.</li>
+                        <li>Apply <strong>least privilege</strong> — most users need Read + Build, not Admin.</li>
+                        <li>Patch Jenkins &amp; plugins promptly; subscribe to security advisories.</li>
+                    </ul>
+                    <div class="callout"><strong>Never</strong> expose an unsecured controller to the internet — it's effectively remote code execution as the Jenkins user.</div>
+                </div>
+                <footer class="footer">
+                    <small>authn · authz · CSRF · sandbox · least privilege</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 36: Quiz: Security -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Check Your Understanding</p>
+                    <h2>Quiz · Security</h2>
+                </header>
+                <div class="content">
+                    <div class="quiz" data-quiz>
+                        <span class="q-label">Question</span>
+                        <p class="q-text">Which plugin lets you grant permissions like "build but not configure" to specific groups per folder?</p>
+                        <div class="options">
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Git plugin</span></button>
+                            <button class="option" data-correct="true"><span class="mark"></span><span>Role-based Authorization Strategy</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Blue Ocean</span></button>
+                            <button class="option" data-correct="false"><span class="mark"></span><span>Pipeline Utility Steps</span></button>
+                        </div>
+                        <div class="explain">✔ Correct — the Role Strategy plugin defines roles (global &amp; per-project) and assigns them to users/groups for least-privilege access.</div>
+                    </div>
+                    <div class="exercise">
+                        <span class="tag">Practical Exercise</span>
+                        <strong>Lock it down.</strong>
+                        <ol>
+                            <li>Manage Jenkins → Security: confirm "Logged-in users can do anything" is <em>off</em> in production.</li>
+                            <li>Install <em>Role-based Authorization Strategy</em>.</li>
+                            <li>Create a <code class="inline">developer</code> role with Read + Build (no Configure) and assign a test user.</li>
+                            <li>Log in as that user and verify they can't reconfigure jobs.</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>Click an answer to check it</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 37: Backup & maintenance -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Operations</p>
+                    <h2>Backup, Maintenance &amp; Monitoring</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Backup <code class="inline">JENKINS_HOME</code></strong> (config, jobs, secrets, plugins) — that's your whole instance. Plugins: ThinBackup, or just snapshot/rsync the directory.</li>
+                        <li><strong>Build retention:</strong> "Discard old builds" to cap disk usage per job.</li>
+                        <li><strong>Configuration as Code (JCasC):</strong> define the controller's config in YAML for reproducible, version-controlled setups.</li>
+                        <li><strong>Monitoring:</strong> the Monitoring plugin / Prometheus metrics; watch disk, heap, executor saturation.</li>
+                        <li><strong>Upgrades:</strong> stay on <strong>LTS</strong>; test upgrades on a staging controller first.</li>
+                    </ul>
+                    <pre class="code"><span class="c"># Simple file-level backup (stop or quiesce first for consistency)</span>
+tar czf jenkins-backup-$(date +%F).tgz -C /var/lib jenkins
+<span class="c"># Restore = extract into a fresh JENKINS_HOME and start Jenkins</span></pre>
+                    <div class="callout"><strong>Golden rule:</strong> if you can restore <code class="inline">JENKINS_HOME</code>, you can rebuild the server. Test your restore, not just your backup.</div>
+                </div>
+                <footer class="footer">
+                    <small>backup · retention · JCasC · monitoring · LTS</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 38: Blue Ocean -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Feature · Visualization</p>
+                    <h2>Blue Ocean &amp; the Modern UI</h2>
+                </header>
+                <div class="content">
+                    <p><strong>Blue Ocean</strong> gives a clean, visual view of pipelines: each stage as a node, logs inline, and a guided pipeline editor that writes the <code class="inline">Jenkinsfile</code> for you.</p>
+                    <ul>
+                        <li>See parallel branches and exactly which stage failed at a glance.</li>
+                        <li>Click a stage to read just that stage's logs.</li>
+                        <li>Use the visual editor to bootstrap a pipeline, then commit it.</li>
+                    </ul>
+                    <div class="callout"><strong>Note:</strong> Blue Ocean is in maintenance; the classic Stage View and ongoing Pipeline UX improvements cover the same need. Either way, visual stage feedback speeds debugging.</div>
+                </div>
+                <footer class="footer">
+                    <small>visual stages · inline logs · editor</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 39: Best practices -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Judgement</p>
+                    <h2>Best Practices</h2>
+                </header>
+                <div class="content">
+                    <ul>
+                        <li><strong>Pipeline as code:</strong> keep the <code class="inline">Jenkinsfile</code> in the repo; review it like any code.</li>
+                        <li><strong>Build on agents,</strong> never load the controller with heavy work.</li>
+                        <li><strong>Fail fast &amp; keep builds short</strong> — parallelize tests, cache dependencies.</li>
+                        <li><strong>Secrets only via Credentials;</strong> never commit tokens.</li>
+                        <li><strong>Idempotent &amp; reproducible:</strong> pin tool versions, prefer containerized agents.</li>
+                        <li><strong>Clean up:</strong> discard old builds, use <code class="inline">cleanWs()</code>.</li>
+                        <li><strong>DRY with shared libraries;</strong> standardize across teams.</li>
+                        <li><strong>Backup <code class="inline">JENKINS_HOME</code>,</strong> stay on LTS, patch quickly.</li>
+                    </ul>
+                </div>
+                <footer class="footer">
+                    <small>Fast, reproducible, secure, maintainable</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 40: Capstone exercise -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Capstone</p>
+                    <h2>End-to-End Exercise</h2>
+                </header>
+                <div class="content">
+                    <div class="exercise">
+                        <span class="tag">Put It All Together</span>
+                        <strong>Build a complete CI pipeline for a Maven project.</strong>
+                        <ol>
+                            <li>Create a <strong>Multibranch Pipeline</strong> pointing at a Git repo containing a <code class="inline">Jenkinsfile</code>.</li>
+                            <li>Stages: <em>Checkout → Build → Test (parallel unit + lint) → Package</em>.</li>
+                            <li>Add a <code class="inline">choice</code> parameter <code class="inline">ENV</code> and a conditional <em>Deploy</em> stage with <code class="inline">when { branch 'main' }</code>.</li>
+                            <li>Inject a credential with <code class="inline">credentials('demo-token')</code> for the deploy step.</li>
+                            <li>In <code class="inline">post</code>: publish <strong>JUnit</strong> results, <code class="inline">archiveArtifacts 'target/*.jar'</code>, and notify on <code class="inline">failure</code>.</li>
+                            <li>Run it on a labelled <strong>agent</strong> and confirm green stages in the Stage View / Blue Ocean.</li>
+                        </ol>
+                    </div>
+                    <div class="callout"><strong>Stretch:</strong> move the common stages into a <em>shared library</em> and reduce each project's Jenkinsfile to a few lines.</div>
+                </div>
+                <footer class="footer">
+                    <small>Multibranch · params · credentials · agents · reports</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+            <!-- 41: Summary -->
+            <article class="slide">
+                <header>
+                    <p class="kicker">Wrap-Up</p>
+                    <h2>Key Takeaways</h2>
+                </header>
+                <div class="content center">
+                    <ul>
+                        <li><strong>Jenkins</strong> is an extensible automation server with a <strong>controller/agent</strong> model.</li>
+                        <li>Install via <strong>WAR, package, MSI or Docker</strong>; everything lives in <code class="inline">JENKINS_HOME</code>.</li>
+                        <li>Prefer <strong>Pipeline-as-code</strong> (Jenkinsfile) over freestyle for real work.</li>
+                        <li>Drive builds with <strong>triggers</strong>, customize with <strong>parameters</strong>, secure with <strong>credentials</strong>.</li>
+                        <li>Scale with <strong>agents</strong>, integrate <strong>SCM/Multibranch</strong>, publish <strong>artifacts &amp; reports</strong>.</li>
+                        <li>Reuse with <strong>shared libraries</strong>, lock down <strong>security</strong>, and <strong>back up</strong> relentlessly.</li>
+                    </ul>
+                    <div class="pill-row">
+                        <span class="pill">install</span>
+                        <span class="pill">pipeline</span>
+                        <span class="pill">credentials</span>
+                        <span class="pill">agents</span>
+                        <span class="pill">reports</span>
+                        <span class="pill warn">Lab 09 next →</span>
+                    </div>
+                </div>
+                <footer class="footer">
+                    <small>End of Lesson 09 · Jenkins</small>
+                    <div class="progress"><div class="bar"></div></div>
+                </footer>
+            </article>
+
+        </section>
+
+        <nav class="navigation">
+            <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+            <div class="page-navigation">
+                <div class="page-numbers" id="pageNumbers"></div>
+                <span class="slide-counter" id="counter">1 / 41</span>
+            </div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+            </div>
+        </nav>
+    </main>
+
+    <script>
+        const slides = [...document.querySelectorAll(".slide")];
+        const progressBars = [...document.querySelectorAll(".bar")];
+        const counter = document.getElementById("counter");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        let index = 0;
+
+        function render() {
+            slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBars.forEach((bar) => { bar.style.width = `${progress}%`; });
+            counter.textContent = `${index + 1} / ${slides.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slides.length - 1;
+            prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+            nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+            generatePageNumbers();
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= slides.length) { index = n - 1; render(); }
+        }
+
+        function generatePageNumbers() {
+            const pageNumbers = document.getElementById("pageNumbers");
+            if (!pageNumbers) return;
+            pageNumbers.innerHTML = "";
+            const total = slides.length;
+            const current = index + 1;
+            const show = [];
+            if (total > 0) show.push(1);
+            for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+                if (!show.includes(i)) show.push(i);
+            }
+            if (total > 1 && !show.includes(total)) show.push(total);
+            show.sort((a, b) => a - b);
+            show.forEach((p, i) => {
+                if (i > 0 && p - show[i - 1] > 1) {
+                    const e = document.createElement("span");
+                    e.textContent = "...";
+                    e.className = "page-ellipsis";
+                    pageNumbers.appendChild(e);
+                }
+                const b = document.createElement("button");
+                b.textContent = p;
+                b.className = "page-number" + (p === current ? " active" : "");
+                b.onclick = () => goToSlide(p);
+                pageNumbers.appendChild(b);
+            });
+        }
+
+        function nextSlide() { index = Math.min(index + 1, slides.length - 1); render(); }
+        function prevSlide() { index = Math.max(index - 1, 0); render(); }
+
+        nextBtn.addEventListener("click", nextSlide);
+        prevBtn.addEventListener("click", prevSlide);
+
+        window.addEventListener("keydown", (e) => {
+            const tag = (e.target.tagName || "").toLowerCase();
+            if (tag === "input" || tag === "textarea") return;
+            if (["ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); nextSlide(); }
+            if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); prevSlide(); }
+        });
+
+        /* ---- Interactive quizzes ---- */
+        document.querySelectorAll("[data-quiz]").forEach((quiz) => {
+            const options = [...quiz.querySelectorAll(".option")];
+            const explain = quiz.querySelector(".explain");
+            options.forEach((opt) => {
+                opt.addEventListener("click", () => {
+                    const isCorrect = opt.dataset.correct === "true";
+                    options.forEach((o) => {
+                        o.disabled = true;
+                        const mark = o.querySelector(".mark");
+                        if (o.dataset.correct === "true") {
+                            o.classList.add("correct");
+                            if (mark) mark.textContent = "✔";
+                        } else if (o === opt) {
+                            o.classList.add("incorrect");
+                            if (mark) mark.textContent = "✗";
+                        }
+                    });
+                    if (explain) explain.classList.add("show");
+                });
+            });
+        });
+
+        render();
+    </script>
+</body>
+
+</html>

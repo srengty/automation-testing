@@ -1,0 +1,28 @@
+// Exercise 6 — distributed builds: parallel stages and a labelled agent.
+// Create an agent in Manage Jenkins -> Nodes with label "demo-agent" first
+// (or change the label below to one your instance already has, e.g. "built-in").
+pipeline {
+    agent { label 'demo-agent' }
+
+    stages {
+        stage('Checkout') {
+            steps { echo "Running on ${env.NODE_NAME}" }
+        }
+        stage('Tests') {
+            parallel {
+                stage('Unit') {
+                    steps { echo 'Running unit tests...' }
+                }
+                stage('Lint') {
+                    steps { echo 'Running static analysis...' }
+                }
+                stage('Integration') {
+                    steps { echo 'Running integration tests...' }
+                }
+            }
+        }
+        stage('Package') {
+            steps { echo 'Packaging artifact...' }
+        }
+    }
+}

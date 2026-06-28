@@ -1,0 +1,37 @@
+// Exercise 7 — publish test reports and archive artifacts.
+// Works against a Maven project (point "Pipeline from SCM" at one, or adapt the
+// shell steps). Requires the JUnit plugin (bundled) and, optionally, Allure.
+pipeline {
+    agent any
+
+    stages {
+        stage('Build & Test') {
+            steps {
+                // Use a docker agent or a Maven tool install on the agent.
+                sh 'mvn -B clean test'
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'mvn -B package -DskipTests'
+                // Pass the jar to a later stage in the SAME run:
+                stash name: 'app', includes: 'target/*.jar'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Test trend graph on the job page.
+            junit '**/target/surefire-reports/*.xml'
+
+            // Durable, downloadable artifact + fingerprint.
+            archiveArtifacts artifacts: 'target/*.jar',
+                             fingerprint: true,
+                             onlyIfSuccessful: true
+
+            // Optional: Allure report (needs the Allure Jenkins plugin).
+            // allure includeProperties: false, results: [[path: 'target/allure-results']]
+        }
+    }
+}

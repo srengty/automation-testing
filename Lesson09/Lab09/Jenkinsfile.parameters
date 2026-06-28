@@ -1,0 +1,33 @@
+// Exercise 4 — parameterized build with a conditional deploy stage.
+// Run once to register the parameters, then use "Build with Parameters".
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENV', choices: ['dev', 'staging', 'prod'], description: 'Target environment')
+        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Version to deploy')
+        booleanParam(name: 'RUN_SMOKE', defaultValue: true, description: 'Run smoke tests after deploy?')
+    }
+
+    stages {
+        stage('Build') {
+            steps { echo "Building version ${params.VERSION}" }
+        }
+        stage('Deploy') {
+            // Only deploy to prod from the main branch.
+            when {
+                anyOf {
+                    expression { params.ENV != 'prod' }
+                    branch 'main'
+                }
+            }
+            steps {
+                echo "Deploying ${params.VERSION} to ${params.ENV}"
+            }
+        }
+        stage('Smoke tests') {
+            when { expression { params.RUN_SMOKE } }
+            steps { echo "Smoke testing ${params.ENV}" }
+        }
+    }
+}
