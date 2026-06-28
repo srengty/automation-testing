@@ -1,0 +1,1 @@
+{"id":"033fe40443f80d1ff4642c90b86b9c42","fullName":"products.spec.ts:13:5","name":"POST creates a product, GET reads it back","status":"failed","testResultsByEnv":{"default":"bd9bf83e569ec8a321396c503b12c3ee"}}
